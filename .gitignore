@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Node / frontend
+node_modules/
+.codex/skills
+/openspec
+dist/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Rust / Tauri
+target/
+src-tauri/target/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Editor and temporary files
+*.swp
+*.swo
+*.tmp
