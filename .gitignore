@@ -3,6 +3,7 @@
 
 # Node / frontend
 node_modules/
+.agents/skills
 .codex/skills
 /openspec
 dist/
