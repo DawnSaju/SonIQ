@@ -40,6 +40,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install NASM for Intel FFmpeg
+        if: matrix.architecture == 'x64'
+        run: |
+          brew install nasm
+          echo "$(brew --prefix nasm)/bin" >> "$GITHUB_PATH"
+
       - name: Build release DMG
         run: npm run build:release
 
