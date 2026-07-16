@@ -103,13 +103,26 @@ export function recognitionMethodForCandidate(candidate: CandidateTrack): Recogn
 
 export function sourceRangesFromResult(result: LocalScanResult, targetedRange?: TargetedRange): TimeRange[] {
   if (targetedRange) return [targetedRange];
-  return (result.samples ?? [])
+
+  const standardRanges = (result.samples ?? [])
     .filter((sample) => sample.status !== "failed")
     .map((sample) => ({
       startSeconds: sample.timestampSeconds,
       endSeconds: sample.timestampSeconds + Math.max(sample.durationSeconds, 0),
     }))
     .filter((range) => range.endSeconds > range.startSeconds);
+
+  if (standardRanges.length > 0) return standardRanges;
+
+  return (result.enhancedSignatureRanges ?? [])
+    .filter(
+      (range) =>
+        Number.isFinite(range.startSeconds) &&
+        Number.isFinite(range.endSeconds) &&
+        range.startSeconds >= 0 &&
+        range.endSeconds > range.startSeconds,
+    )
+    .map((range) => ({ startSeconds: range.startSeconds, endSeconds: range.endSeconds }));
 }
 
 export function receiptForResult(result: LocalScanResult, enhancedRecognition: boolean, targetedRange?: TargetedRange): RecognitionReceipt {
