@@ -9,7 +9,9 @@
     "build": "tsc && vite build",
     "test:domain": "node --test scripts/soundtrack-model.test.mjs scripts/recognition-adapter.test.cjs",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "prepare:release-runtime": "node scripts/build-media-tools.mjs && node scripts/package-recognition-sidecar.mjs",
+    "build:release": "npm run prepare:release-runtime && tauri build --config src-tauri/tauri.release.conf.json --bundles app && node scripts/create-release-dmg.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.0",
@@ -18,7 +20,6 @@
     "@tauri-apps/plugin-dialog": "^2.0.0",
     "@tauri-apps/plugin-opener": "^2.0.0",
     "@tauri-apps/plugin-store": "^2.0.0",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
     "react": "^18.3.1",
@@ -32,6 +33,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "@yao-pkg/pkg": "^6.21.0",
     "tailwindcss": "^4.3.2",
     "typescript": "~5.6.3",
     "vite": "^6.0.1"

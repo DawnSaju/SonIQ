@@ -17,6 +17,11 @@ pnpm-debug.log*
 target/
 src-tauri/target/
 
+*.dmg
+*.app
+release-artifacts/
+src-tauri/resources/release-runtime/
+
 # Local configuration and secrets
 .env
 .env.*
