@@ -1,6 +1,6 @@
 [package]
 name = "soniq"
-version = "0.1.0"
+version = "0.1.1"
 description = "A local first music discovery app for video"
 authors = ["DawnSaju"]
 edition = "2021"
