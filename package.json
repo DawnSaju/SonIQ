@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "test:domain": "node --test scripts/soundtrack-model.test.mjs scripts/shazam-recognize.test.cjs",
+    "test:domain": "node --test scripts/soundtrack-model.test.mjs scripts/recognition-adapter.test.cjs",
     "preview": "vite preview",
     "tauri": "tauri"
   },
