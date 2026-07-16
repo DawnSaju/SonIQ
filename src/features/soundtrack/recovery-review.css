@@ -1,0 +1,249 @@
+.track-group .group-label-row {
+  min-height: 43px;
+}
+
+.track-row--recovery {
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 92px;
+}
+
+.track-row--recovery.is-removed {
+  opacity: 0.58;
+}
+
+.track-row--recovery.is-preview-active {
+  border-bottom-color: transparent;
+}
+
+.track-row-main {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 28px 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+}
+
+.track-row-main .track-artwork {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+}
+
+.track-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.track-copy strong,
+.track-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-copy strong {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 610;
+}
+
+.track-copy small {
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.track-row-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.recovery-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 80px;
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 570;
+  text-transform: capitalize;
+}
+
+.recovery-state::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.recovery-state.is-confirmed,
+.recovery-state.is-edited,
+.recovery-state.is-manual {
+  color: var(--accent);
+}
+
+.track-row-actions {
+  justify-content: flex-end;
+}
+
+.track-row-actions .quiet-action {
+  min-height: 28px;
+}
+
+.track-preview-disclosure,
+.track-preview-notice {
+  margin: 0;
+  border-bottom: 1px solid var(--separator);
+  padding: 0 16px 13px 101px;
+  color: var(--secondary);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.track-preview-disclosure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+}
+
+.track-preview-disclosure small {
+  flex-basis: 100%;
+  color: var(--tertiary);
+  font-size: inherit;
+}
+
+.track-preview-store-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.track-preview-store-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.track-preview-store-link:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
+}
+
+.track-edit-panel,
+.manual-track-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border-bottom: 1px solid var(--separator);
+  padding: 14px 16px 16px;
+  background: var(--surface-subtle);
+}
+
+.manual-track-panel {
+  margin: 0 24px 16px;
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+}
+
+.track-edit-panel label,
+.manual-track-panel label {
+  display: grid;
+  gap: 5px;
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 560;
+}
+
+.track-edit-panel input,
+.track-edit-panel textarea,
+.manual-track-panel input,
+.manual-track-panel textarea {
+  width: 100%;
+  min-height: 32px;
+  border: 1px solid var(--separator-strong);
+  border-radius: 7px;
+  padding: 7px 9px;
+  color: var(--foreground);
+  background: var(--surface);
+  font-size: 12px;
+  outline: 0;
+}
+
+.track-edit-panel textarea,
+.manual-track-panel textarea {
+  min-height: 55px;
+  resize: vertical;
+}
+
+.track-edit-panel input:focus,
+.track-edit-panel textarea:focus,
+.manual-track-panel input:focus,
+.manual-track-panel textarea:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 3px var(--accent-fill);
+}
+
+.track-edit-panel .field-span,
+.manual-track-panel .field-span {
+  grid-column: 1 / -1;
+}
+
+.field-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.review-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.review-toast,
+.library-undo-toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 24px 16px;
+  border: 1px solid var(--separator);
+  border-radius: 9px;
+  padding: 9px 12px;
+  color: var(--secondary);
+  background: var(--surface-subtle);
+  font-size: 12px;
+}
+
+.review-scan-note {
+  margin: 14px 24px -8px;
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.review-toast button,
+.library-undo-toast button {
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  font-weight: 620;
+  cursor: pointer;
+}
+

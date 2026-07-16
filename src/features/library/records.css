@@ -1,0 +1,35 @@
+.library-summary-header {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--separator);
+  padding: 0 20px;
+}
+
+.library-summary-header h1 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 18px;
+  font-weight: 620;
+  letter-spacing: -0.025em;
+}
+
+.library-summary-header p {
+  margin: 4px 0 0;
+  color: var(--secondary);
+  font-size: 12px;
+}
+
+.library-scan-row--record {
+  grid-template-columns: 52px minmax(0, 1fr) minmax(110px, auto) auto;
+}
+
+.library-scan-row--record .library-row-actions {
+  justify-content: flex-end;
+}
+
+.library-row-actions .quiet-action {
+  min-height: 28px;
+}

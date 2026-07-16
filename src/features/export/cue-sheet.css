@@ -1,0 +1,142 @@
+.cue-sheet-preview {
+  display: grid;
+  gap: 0;
+  margin: 24px;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+}
+
+.cue-sheet-preview-header {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--separator);
+  padding: 0 16px;
+}
+
+.cue-sheet-preview-header strong {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 610;
+}
+
+.cue-sheet-preview-header span {
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.cue-sheet-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cue-sheet-row {
+  min-height: 58px;
+  border-bottom: 1px solid var(--separator);
+  padding: 10px 16px;
+}
+
+.cue-sheet-row:last-child {
+  border-bottom: 0;
+}
+
+.cue-sheet-time {
+  min-width: 56px;
+  color: var(--secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cue-sheet-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.cue-sheet-copy strong,
+.cue-sheet-copy small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cue-sheet-copy strong {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 590;
+}
+
+.cue-sheet-copy small {
+  margin-top: 2px;
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.cue-sheet-row .quiet-action {
+  flex: 0 0 auto;
+}
+
+.receipt-surface {
+  margin: 0 24px 16px;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+}
+
+.receipt-surface summary {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 590;
+  cursor: pointer;
+  list-style: none;
+}
+
+.receipt-surface summary::-webkit-details-marker {
+  display: none;
+}
+
+.receipt-surface summary span {
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.receipt-list {
+  margin: 0;
+  border-top: 1px solid var(--separator);
+  padding: 0;
+  list-style: none;
+}
+
+.receipt-row {
+  min-height: 56px;
+  border-bottom: 1px solid var(--separator);
+  padding: 10px 16px;
+}
+
+.receipt-row:last-child {
+  border-bottom: 0;
+}
+
+.receipt-row > span:first-child {
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.receipt-row > span:last-child {
+  max-width: min(70%, 520px);
+  color: var(--foreground);
+  font-size: 12px;
+  text-align: right;
+}
+
