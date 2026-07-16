@@ -37,8 +37,29 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Cargo dependencies and build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            src-tauri/target
+          key: cargo-${{ runner.os }}-${{ matrix.architecture }}-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-${{ matrix.architecture }}-
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Cache SonIQ release runtime
+        uses: actions/cache@v4
+        with:
+          path: |
+            release-artifacts/ffmpeg-runtime/source-cache
+            release-artifacts/pkg-cache
+            src-tauri/resources/release-runtime
+          key: release-runtime-${{ runner.os }}-${{ matrix.architecture }}-${{ hashFiles('scripts/build-media-tools.mjs', 'scripts/package-recognition-sidecar.mjs', 'scripts/recognition-adapter.cjs', 'package-lock.json') }}
 
       - name: Install NASM for Intel FFmpeg
         if: matrix.architecture == 'x64'
