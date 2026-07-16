@@ -34,6 +34,17 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Read app version
+        id: app-version
+        shell: bash
+        run: |
+          app_version="$(node -p \"require('./package.json').version\")"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" && "v${app_version}" != "${GITHUB_REF_NAME}" ]]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match app version ${app_version}." >&2
+            exit 1
+          fi
+          echo "value=${app_version}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
@@ -67,21 +78,29 @@ jobs:
           brew install nasm
           echo "$(brew --prefix nasm)/bin" >> "$GITHUB_PATH"
 
+      - name: Clear stale DMG artifacts
+        shell: bash
+        run: |
+          dmg_directory="src-tauri/target/release/bundle/dmg"
+          mkdir -p "$dmg_directory"
+          rm -f "$dmg_directory"/SonIQ_*_${{ matrix.dmg_suffix }}.dmg \
+            "$dmg_directory"/SonIQ_*_${{ matrix.dmg_suffix }}.dmg.sha256
+
       - name: Build release DMG
         run: npm run build:release
 
       - name: Write release checksum
         run: |
           cd src-tauri/target/release/bundle/dmg
-          shasum -a 256 SonIQ_*_${{ matrix.dmg_suffix }}.dmg > SonIQ_${{ matrix.dmg_suffix }}.dmg.sha256
+          shasum -a 256 SonIQ_${{ steps.app-version.outputs.value }}_${{ matrix.dmg_suffix }}.dmg > SonIQ_${{ steps.app-version.outputs.value }}_${{ matrix.dmg_suffix }}.dmg.sha256
 
       - name: Upload ${{ matrix.architecture }} DMG
         uses: actions/upload-artifact@v4
         with:
           name: soniq-dmg-${{ matrix.architecture }}
           path: |
-            src-tauri/target/release/bundle/dmg/SonIQ_*_${{ matrix.dmg_suffix }}.dmg
-            src-tauri/target/release/bundle/dmg/SonIQ_${{ matrix.dmg_suffix }}.dmg.sha256
+            src-tauri/target/release/bundle/dmg/SonIQ_${{ steps.app-version.outputs.value }}_${{ matrix.dmg_suffix }}.dmg
+            src-tauri/target/release/bundle/dmg/SonIQ_${{ steps.app-version.outputs.value }}_${{ matrix.dmg_suffix }}.dmg.sha256
           if-no-files-found: error
 
   publish-release:
@@ -106,8 +125,8 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           ls -lh release-assets/*
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release upload "$RELEASE_TAG" release-assets/* --clobber
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" release-assets/* --clobber --repo "$GITHUB_REPOSITORY"
           else
-            gh release create "$RELEASE_TAG" release-assets/* --title "$RELEASE_TAG" --generate-notes
+            gh release create "$RELEASE_TAG" release-assets/* --title "$RELEASE_TAG" --generate-notes --repo "$GITHUB_REPOSITORY"
           fi
