@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
@@ -50,6 +50,7 @@ console.log("Ad-hoc signing the complete SonIQ.app bundle…");
 run("/usr/bin/codesign", ["--force", "--deep", "--sign", "-", appPath]);
 run("/usr/bin/codesign", ["--verify", "--deep", "--strict", appPath]);
 
+mkdirSync(dirname(dmgPath), { recursive: true });
 console.log(`Creating ${dmgPath}…`);
 run("/usr/bin/hdiutil", [
   "create",
