@@ -1,0 +1,303 @@
+/* Soundtrack recovery workspace ------------------------------------------------
+   These additions intentionally reuse the existing quiet workspace shell. A
+   recovery session is one connected working surface, not a dashboard of cards. */
+.recovery-toolbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The soundtrack map is intentionally compact evidence—not a waveform editor
+   or a completeness claim. It uses the same grouped-surface language as the
+   review rows and keeps all labels visible without relying on color alone. */
+.soundtrack-map-surface {
+  margin: 0 24px 16px;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.soundtrack-map-heading {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--separator);
+  padding: 14px 16px;
+}
+
+.soundtrack-map-heading h2 {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: -0.02em;
+}
+
+.soundtrack-map-heading p,
+.soundtrack-map-hint,
+.soundtrack-map-unavailable {
+  margin: 4px 0 0;
+  color: var(--secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.soundtrack-map-source {
+  display: inline-flex;
+  min-width: 0;
+  max-width: 36%;
+  align-items: center;
+  gap: 6px;
+  color: var(--tertiary);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.soundtrack-map-source svg {
+  flex: 0 0 auto;
+}
+
+.soundtrack-map-source {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.soundtrack-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  border-bottom: 1px solid var(--separator);
+  padding: 10px 16px;
+  color: var(--secondary);
+  font-size: 11px;
+}
+
+.soundtrack-map-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.soundtrack-map-key {
+  width: 12px;
+  height: 8px;
+  border: 1px solid var(--separator-strong);
+  border-radius: 3px;
+  background: var(--surface-subtle);
+}
+
+.soundtrack-map-key--activity {
+  background: var(--control-fill);
+}
+
+.soundtrack-map-key--checked {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+}
+
+.soundtrack-map-key--evidence {
+  width: 8px;
+  height: 8px;
+  border-color: var(--accent);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.soundtrack-map-key--gap {
+  background: transparent;
+}
+
+.soundtrack-map-lanes {
+  padding: 13px 16px 11px;
+}
+
+.soundtrack-map-lane {
+  display: grid;
+  min-height: 34px;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.soundtrack-map-lane-label {
+  color: var(--secondary);
+  font-size: 11px;
+  font-weight: 560;
+}
+
+.soundtrack-map-track {
+  position: relative;
+  min-width: 0;
+  height: 24px;
+  border: 1px solid var(--separator);
+  border-radius: 7px;
+  background: var(--surface-subtle);
+}
+
+.soundtrack-map-segment {
+  position: absolute;
+  z-index: 1;
+  top: 3px;
+  bottom: 3px;
+  min-width: 6px;
+  border: 1px solid var(--separator-strong);
+  border-radius: 5px;
+  padding: 0;
+  background: var(--control-fill);
+}
+
+button.soundtrack-map-segment {
+  min-width: 24px;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 100ms ease-out;
+}
+
+button.soundtrack-map-segment:hover {
+  z-index: 3;
+  border-color: var(--foreground);
+}
+
+button.soundtrack-map-segment:active {
+  transform: scale(0.97);
+}
+
+button.soundtrack-map-segment:focus-visible {
+  z-index: 4;
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.soundtrack-map-segment--activity {
+  background: var(--control-fill);
+}
+
+.soundtrack-map-segment--checked {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+}
+
+.soundtrack-map-segment--evidence {
+  top: 1px;
+  bottom: auto;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  border: 4px solid var(--surface);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  transform: translateX(-50%);
+}
+
+button.soundtrack-map-segment--evidence:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.soundtrack-map-empty-lane {
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  padding: 0 8px;
+  color: var(--tertiary);
+  font-size: 10px;
+}
+
+.soundtrack-map-axis {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 1px;
+  color: var(--tertiary);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.soundtrack-map-axis span:last-child {
+  text-align: right;
+}
+
+.soundtrack-map-hint,
+.soundtrack-map-unavailable {
+  border-top: 1px solid var(--separator);
+  padding: 10px 16px;
+}
+
+.soundtrack-map-unavailable {
+  margin: 0;
+}
+
+.soundtrack-map-timestamp-list {
+  display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.soundtrack-map-timestamp-list li + li {
+  border-top: 1px solid var(--separator);
+}
+
+.soundtrack-map-timestamp-list button,
+.soundtrack-map-timestamp-list span {
+  display: grid;
+  width: 100%;
+  gap: 3px;
+  border: 0;
+  padding: 12px 16px;
+  color: var(--foreground);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+}
+
+.soundtrack-map-timestamp-list button {
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 100ms ease-out;
+}
+
+.soundtrack-map-timestamp-list button:hover {
+  background: var(--surface-subtle);
+}
+
+.soundtrack-map-timestamp-list button:active {
+  transform: scale(0.99);
+}
+
+.soundtrack-map-timestamp-list strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.soundtrack-map-timestamp-list small {
+  color: var(--secondary);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.quiet-action {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 9px;
+  color: var(--secondary);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 560;
+  cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease, transform 100ms ease-out;
+}
+
+.quiet-action:hover {
+  color: var(--foreground);
+  background: var(--control-fill);
+}
+
+.quiet-action:active {
+  transform: scale(0.97);
+}

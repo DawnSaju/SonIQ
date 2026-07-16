@@ -1,0 +1,23 @@
+[package]
+name = "soniq"
+version = "0.1.0"
+description = "A local first music discovery app for video"
+authors = ["DawnSaju"]
+edition = "2021"
+
+[lib]
+name = "soniq_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+reqwest = { version = "0.13", features = ["blocking", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-store = "2"

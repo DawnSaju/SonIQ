@@ -1,0 +1,187 @@
+.track-row {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) 92px 128px 98px;
+  min-height: 96px;
+  align-items: center;
+  gap: 14px;
+  border: 0;
+  border-bottom: 1px solid var(--separator);
+  padding: 10px 16px;
+  color: var(--foreground);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 140ms ease, transform 100ms ease-out;
+}
+
+.track-row:hover,
+.track-row.is-selected {
+  background: var(--row-fill);
+}
+
+.track-row:active {
+  transform: scale(0.997);
+}
+
+.track-name {
+  display: grid;
+  grid-template-columns: 26px 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.track-artwork {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+  border-radius: 12px;
+  color: var(--secondary);
+  background: var(--control-fill);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12);
+}
+
+.track-artwork--library {
+  width: 52px;
+  height: 52px;
+  border-radius: 11px;
+}
+
+.track-artwork img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.track-artwork--preview {
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+}
+
+.track-artwork--preview:disabled {
+  cursor: wait;
+}
+
+.track-artwork-preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.42);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 160ms var(--motion-ease-out), transform 160ms var(--motion-ease-out);
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+.track-artwork-preview-loading {
+  letter-spacing: 0.16em;
+  transform: translateX(0.08em);
+}
+
+.track-artwork--preview:focus-visible .track-artwork-preview-overlay,
+.track-artwork--preview[data-playing="true"] .track-artwork-preview-overlay,
+.track-artwork--preview[data-loading="true"] .track-artwork-preview-overlay {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .track-artwork--preview:hover .track-artwork-preview-overlay {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .track-artwork--preview .track-artwork-preview-overlay {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.track-artwork--preview:active .track-artwork-preview-overlay {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
+}
+
+.track-name > span:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.track-name strong {
+  overflow: hidden;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 610;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-name small {
+  overflow: hidden;
+  color: var(--secondary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timestamp-chip {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 5px 7px;
+  color: var(--secondary);
+  background: var(--control-fill);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.confidence {
+  color: var(--tertiary);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.confidence.high {
+  color: var(--accent);
+}
+
+.selection-state {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 7px;
+  color: var(--tertiary);
+  font-size: 11px;
+  font-weight: 560;
+}
+
+.selection-state.is-selected {
+  color: var(--accent);
+}
+
+.selection-mark {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid var(--separator-strong);
+  border-radius: 50%;
+  color: var(--button-primary-foreground);
+}
+
+.track-row.is-selected .selection-mark {
+  border-color: var(--button-primary);
+  background: var(--button-primary);
+}

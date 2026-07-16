@@ -1,0 +1,332 @@
+/* Onboarding — split-panel layout */
+.onboarding-shell {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  color: var(--foreground);
+  background: var(--window);
+}
+
+.onboarding-left {
+  display: flex;
+  flex-direction: column;
+  width: 55%;
+  flex-shrink: 0;
+  padding: 48px 56px;
+}
+
+.onboarding-left-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--foreground);
+}
+
+.onboarding-left-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 420px;
+  padding: 0 0 48px;
+}
+
+.onboarding-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.kicker-pill {
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--accent);
+  background: var(--accent-fill);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.onboarding-title {
+  margin: 0;
+  color: var(--foreground);
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.onboarding-subtitle {
+  margin: 10px 0 0;
+  color: var(--secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.onboarding-separator {
+  width: 100%;
+  height: 1px;
+  margin: 28px 0;
+  background: var(--separator);
+}
+
+.onboarding-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onboarding-field-label {
+  color: var(--secondary);
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.onboarding-field-input {
+  width: 100%;
+  height: 42px;
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  padding: 0 14px;
+  color: var(--foreground);
+  background: var(--control-fill);
+  font-size: 14px;
+  outline: 0;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+.onboarding-field-input::placeholder {
+  color: var(--tertiary);
+}
+
+.onboarding-field-input:focus {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-fill);
+}
+
+.onboarding-appearance {
+  border: 0;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+.onboarding-appearance legend {
+  margin-bottom: 8px;
+}
+
+.appearance-options {
+  display: flex;
+  gap: 10px;
+}
+
+.appearance-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 38px;
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  padding: 0 16px;
+  color: var(--secondary);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 140ms ease;
+}
+
+.appearance-option:hover {
+  border-color: var(--separator-strong);
+  background: var(--control-fill);
+  color: var(--foreground);
+}
+
+.appearance-option:active {
+  transform: scale(0.97);
+}
+
+.appearance-option.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+  color: var(--foreground);
+}
+
+.onboarding-actions {
+  margin-top: 32px;
+}
+
+.soniq-button.onboarding-continue {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Right preview panel */
+.onboarding-right {
+  display: flex;
+  width: 45%;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 40px;
+  background: var(--surface-subtle);
+  border-left: 1px solid var(--separator);
+}
+
+.onboarding-shell[data-theme="dark"] .onboarding-right {
+  background: #0a0a0a;
+}
+
+.onboarding-preview-card {
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--canvas-shadow);
+}
+
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--separator);
+}
+
+.preview-card-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+}
+
+.preview-card-brand .app-brand-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+
+.preview-card-nav {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.preview-nav-item {
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--tertiary);
+}
+
+.preview-nav-item.is-active {
+  color: var(--foreground);
+  background: var(--control-fill);
+}
+
+.preview-card-body {
+  padding: 12px;
+}
+
+.preview-card-workspace {
+  border: 1px solid var(--separator);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.preview-workspace-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--separator);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--secondary);
+}
+
+.preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--control-fill);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--tertiary);
+}
+
+.preview-workspace-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 200px;
+  color: var(--tertiary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Onboarding animations */
+@keyframes ob-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ob-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.ob-stagger {
+  animation: ob-fade-up 400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.ob-scale-in {
+  animation: ob-scale 500ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-stagger,
+  .ob-scale-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

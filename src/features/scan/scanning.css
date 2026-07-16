@@ -1,0 +1,58 @@
+.sample-list,
+.track-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scan-progress-track {
+  height: 3px;
+  overflow: hidden;
+  background: var(--control-fill);
+}
+
+.scan-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 240ms ease;
+}
+
+.sample-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  min-height: 66px;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--separator);
+  padding: 11px 16px;
+}
+
+.sample-row--discovery .sample-index {
+  color: var(--accent);
+}
+
+.sample-index,
+.track-number {
+  color: var(--tertiary);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sample-row > span:nth-child(2) {
+  display: grid;
+  gap: 3px;
+}
+
+.sample-row strong {
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 580;
+}
+
+.sample-row small {
+  color: var(--secondary);
+  font-size: 12px;
+}
+

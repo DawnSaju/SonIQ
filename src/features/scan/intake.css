@@ -1,0 +1,67 @@
+/* Intake Canvas */
+.full-bleed-dropzone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background-color 200ms ease;
+  z-index: 10;
+}
+
+.full-bleed-dropzone.is-dragging {
+  background: var(--surface);
+}
+
+.full-bleed-dropzone.is-dragging .dropzone-content {
+  transform: scale(0.97);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.dropzone-title {
+  margin: 18px 0 0;
+  color: var(--foreground);
+  font-size: clamp(24px, 2.2vw, 32px);
+  font-weight: 620;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.dropzone-detail {
+  max-width: 440px;
+  margin: 12px 0 24px;
+  color: var(--secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dropzone-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropzone-error {
+  margin-top: 24px;
+}
+
+.full-bleed-footnote {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  color: var(--tertiary);
+  font-size: 11px;
+}
+
