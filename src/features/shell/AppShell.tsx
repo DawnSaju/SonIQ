@@ -1,4 +1,4 @@
-import { LockKeyhole, Moon, Music2, Settings, Sun } from "lucide-react";
+import { LockKeyhole, Moon, Music2, Settings, Sun, LayoutGrid, List } from "lucide-react";
 import type { AppView, Theme } from "../workspace/types";
 
 export function AppSidebar({
@@ -44,12 +44,16 @@ export function WorkspaceToolbar({
   activeView,
   context,
   theme,
+  viewMode,
   onToggleTheme,
+  onToggleViewMode,
 }: {
   activeView: AppView;
   context?: string;
   theme: Theme;
+  viewMode?: "list" | "grid";
   onToggleTheme: () => void;
+  onToggleViewMode?: (mode: "list" | "grid") => void;
 }) {
   return (
     <div className="workspace-toolbar">
@@ -57,6 +61,16 @@ export function WorkspaceToolbar({
         {context ?? (activeView === "scan" ? "New scan" : activeView === "library" ? "Library" : "Settings")}
       </div>
       <div className="toolbar-actions">
+        {activeView === "library" && onToggleViewMode && (
+          <div className="segmented-control" role="group" aria-label="View mode">
+            <button className={viewMode === "list" ? "segmented-control-item is-active" : "segmented-control-item"} type="button" onClick={() => onToggleViewMode("list")} aria-label="List view" title="List view">
+              <List size={14} aria-hidden="true" />
+            </button>
+            <button className={viewMode === "grid" ? "segmented-control-item is-active" : "segmented-control-item"} type="button" onClick={() => onToggleViewMode("grid")} aria-label="Grid view" title="Grid view">
+              <LayoutGrid size={14} aria-hidden="true" />
+            </button>
+          </div>
+        )}
         <span className="header-local-status">
           <LockKeyhole size={13} aria-hidden="true" />
         </span>

@@ -24,13 +24,13 @@
 .library-scan-row {
   display: grid;
   width: 100%;
-  grid-template-columns: 52px minmax(0, 1fr) minmax(130px, auto) 18px;
+  grid-template-columns: 52px minmax(0, 1fr) minmax(130px, auto) auto;
   min-height: 84px;
   align-items: center;
   gap: 14px;
   border: 0;
   border-bottom: 1px solid var(--separator);
-  padding: 14px 20px;
+  padding: 14px 32px;
   color: var(--foreground);
   background: transparent;
   text-align: left;
@@ -58,6 +58,11 @@
   display: grid;
   min-width: 0;
   gap: 4px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .library-scan-copy strong {
@@ -78,6 +83,20 @@
   white-space: nowrap;
 }
 
+.library-rename-input {
+  width: 100%;
+  padding: 2px 6px;
+  font-size: 14px;
+  font-weight: 610;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  outline: none;
+  font-family: inherit;
+  margin: -3px -7px;
+}
+
 .library-scan-status {
   justify-self: end;
   color: var(--secondary);
@@ -88,6 +107,12 @@
 
 .library-scan-status.is-confirmed {
   color: var(--accent);
+}
+
+.library-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .handoff-row {
@@ -131,22 +156,7 @@
   text-align: center;
 }
 
-.library-empty-state h2 {
-  margin: 18px 0 0;
-  color: var(--foreground);
-  font-size: clamp(24px, 2.2vw, 32px);
-  font-weight: 620;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-}
 
-.library-empty-state p {
-  max-width: 440px;
-  margin: 12px 0 24px;
-  color: var(--secondary);
-  font-size: 14px;
-  line-height: 1.5;
-}
 
 .empty-review-state {
   display: flex;
@@ -193,4 +203,136 @@
   color: var(--secondary);
   font-size: 13px;
   line-height: 1.45;
+}
+
+/* --- View Mode Toggle --- */
+
+.segmented-control {
+  display: flex;
+  align-items: center;
+  background: var(--tertiary);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.segmented-control-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 22px;
+  border-radius: 4px;
+  color: var(--secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.segmented-control-item:hover {
+  color: var(--foreground);
+}
+
+.segmented-control-item.is-active {
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.app-shell[data-theme="dark"] .segmented-control-item.is-active {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* --- Grid View --- */
+
+.library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  padding: 24px 32px;
+  list-style: none;
+  margin: 0;
+}
+
+.library-grid-card {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 12px;
+  padding: 14px;
+  transition: background-color 150ms ease;
+}
+
+.library-grid-card:hover {
+  background: var(--row-fill);
+}
+
+.library-grid-artwork-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+  cursor: pointer;
+  background: var(--fill-secondary);
+  box-shadow: var(--canvas-shadow);
+}
+
+.library-grid-artwork-container .track-artwork {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.library-grid-artwork-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: white;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.library-grid-artwork-container:hover .library-grid-artwork-overlay {
+  opacity: 1;
+}
+
+.library-grid-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.library-grid-title {
+  font-size: 14px;
+  font-weight: 610;
+  color: var(--foreground);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.library-grid-subtitle {
+  font-size: 12px;
+  color: var(--secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.library-grid-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--separator);
 }

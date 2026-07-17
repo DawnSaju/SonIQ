@@ -72,6 +72,7 @@ export default function App() {
   const [systemTheme, setSystemTheme] = useState<Theme>(getSystemTheme);
   const [displayName, setDisplayName] = useState(() => readLocal(nameKey) ?? "");
   const [showOnboarding, setShowOnboarding] = useState(getInitialOnboarding);
+  const [libraryViewMode, setLibraryViewMode] = useState<"list" | "grid">("list");
   const [dragActive, setDragActive] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
   const [scanNotice, setScanNotice] = useState("");
@@ -706,6 +707,19 @@ export default function App() {
     }
   }
 
+  function renameRecord(record: SoundtrackRecord, newName: string) {
+    const trimmed = newName.trim();
+    if (!trimmed || trimmed === record.source.fileName) return;
+    updateRecords((current) => current.map((item) => {
+      if (item.id !== record.id) return item;
+      return {
+        ...item,
+        source: { ...item.source, fileName: trimmed },
+        updatedAt: new Date().toISOString()
+      };
+    }));
+  }
+
   function undoDeleteRecord() {
     if (!deletedRecord) return;
     updateRecords((current) => [deletedRecord, ...current.filter((record) => record.id !== deletedRecord.id)]);
@@ -856,10 +870,10 @@ export default function App() {
           <AppSidebar activeView={activeView} onNewScan={startNewScan} onLibrary={openLibrary} onSettings={openSettings} />
           <main className="app-workspace-container">
             <div className="app-workspace">
-              <WorkspaceToolbar activeView={activeView} context={toolbarContext} theme={theme} onToggleTheme={() => setAppearance(theme === "light" ? "dark" : "light")} />
+              <WorkspaceToolbar activeView={activeView} context={toolbarContext} theme={theme} viewMode={libraryViewMode} onToggleTheme={() => setAppearance(theme === "light" ? "dark" : "light")} onToggleViewMode={setLibraryViewMode} />
               <div className="workspace-canvas">
                 {activeView === "settings" && <SettingsCanvas displayName={displayName} themePreference={themePreference} resolvedTheme={theme} onSaveName={saveDisplayName} onSaveAppearance={setAppearance} onBackToWorkspace={returnToWorkspace} onReset={resetSoniq} />}
-                {activeView === "library" && <SoundtrackLibraryCanvas records={records} onNewScan={startNewScan} onOpen={openRecord} onDelete={deleteRecord} deletedRecord={deletedRecord} onUndoDelete={undoDeleteRecord} />}
+                {activeView === "library" && <SoundtrackLibraryCanvas records={records} viewMode={libraryViewMode} onNewScan={startNewScan} onOpen={openRecord} onDelete={deleteRecord} onRename={renameRecord} deletedRecord={deletedRecord} onUndoDelete={undoDeleteRecord} />}
                 {activeView === "scan" && screen === "import" && <IntakeCanvas displayName={displayName} onSelect={chooseVideo} onDrop={onDrop} dragActive={dragActive} onDragChange={setDragActive} validationMessage={validationMessage} />}
                 {activeView === "scan" && screen === "pending" && source && <PendingCanvas source={source} notice={scanNotice} enhancedRecognition={enhancedRecognition} onBack={startNewScan} onEnhancedRecognitionChange={setEnhancedRecognition} onStart={startScan} />}
                 {activeView === "scan" && screen === "scanning" && source && <ScanningCanvas source={source} progress={scanProgress} enhancedRecognition={enhancedRecognition} onCancel={cancelScan} onNext={completeFixtureScan} />}
