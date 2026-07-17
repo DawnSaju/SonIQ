@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { Monitor, Moon, RotateCcw, Sun } from "lucide-react";
+import { Monitor, Moon, Sun, AlertTriangle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../../components/ui/button";
 import type { Theme, ThemePreference } from "../workspace/types";
+
+const appearanceOptions = [
+  { value: "system", label: "System", icon: Monitor },
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+] as const;
 
 export function SettingsCanvas({
   displayName,
@@ -21,132 +28,155 @@ export function SettingsCanvas({
   onReset: () => void;
 }) {
   const [nameDraft, setNameDraft] = useState(displayName);
-  const [appearanceDraft, setAppearanceDraft] = useState<ThemePreference>(themePreference);
-  const [nameSaved, setNameSaved] = useState(false);
-  const [appearanceSaved, setAppearanceSaved] = useState(false);
   const [resetConfirming, setResetConfirming] = useState(false);
 
   useEffect(() => {
     setNameDraft(displayName);
   }, [displayName]);
 
-  useEffect(() => {
-    setAppearanceDraft(themePreference);
-  }, [themePreference]);
-
-  const cleanedName = nameDraft.trim();
-  const nameChanged = cleanedName !== displayName.trim();
-  const appearanceChanged = appearanceDraft !== themePreference;
-
-  function saveName() {
-    onSaveName(cleanedName);
-    setNameSaved(true);
-  }
-
-  function saveAppearance() {
-    onSaveAppearance(appearanceDraft);
-    setAppearanceSaved(true);
+  function handleNameBlur() {
+    const cleaned = nameDraft.trim();
+    if (cleaned !== displayName.trim()) {
+      onSaveName(cleaned);
+    }
   }
 
   return (
     <section className="settings-view" aria-labelledby="screen-title">
-      <header className="settings-header">
-        <div>
-          <h1 id="screen-title" tabIndex={-1}>Settings</h1>
-          <p>Choose what SonIQ remembers on this Mac.</p>
-        </div>
-        <Button type="button" variant="secondary" onClick={onBackToWorkspace}>Return to workspace</Button>
-      </header>
-
+      <h1 id="screen-title" className="sr-only" tabIndex={-1}>Settings</h1>
+      
       <div className="settings-content">
-        <section className="settings-section" aria-labelledby="settings-workspace-title">
-          <div className="settings-section-heading">
-            <h2 id="settings-workspace-title">Workspace</h2>
-            <p>A local name helps SonIQ greet you. It stays on this Mac.</p>
-          </div>
-          <div className="settings-group">
-            <label className="settings-field" htmlFor="settings-local-name">
-              <span>Local name</span>
+        
+        {/* Workspace Section */}
+        <div className="settings-section">
+          <h2 className="settings-section-title">Workspace</h2>
+          <div className="settings-form-row">
+            <div className="settings-form-label">
+              <label htmlFor="settings-local-name">Local name</label>
+              <p className="settings-form-desc">A local name helps SonIQ greet you.</p>
+            </div>
+            <div className="settings-form-control">
               <input
                 id="settings-local-name"
+                className="mac-text-input"
                 value={nameDraft}
-                onChange={(event) => {
-                  setNameDraft(event.target.value);
-                  setNameSaved(false);
+                onChange={(event) => setNameDraft(event.target.value)}
+                onBlur={handleNameBlur}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.currentTarget.blur();
+                  }
                 }}
                 placeholder="Your name"
                 autoComplete="given-name"
                 maxLength={32}
               />
-              <small>Leave it blank if you prefer a quiet, unnamed workspace.</small>
-            </label>
-            <div className="settings-action-row">
-              <Button type="button" variant="secondary" onClick={saveName} disabled={!nameChanged}>Save changes</Button>
-              <span className="settings-inline-status" role="status" aria-live="polite">{nameSaved ? "Name saved locally." : ""}</span>
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="settings-section" aria-labelledby="settings-appearance-title">
-          <div className="settings-section-heading">
-            <h2 id="settings-appearance-title">Appearance</h2>
-            <p>Let SonIQ follow this Mac, or choose a fixed appearance.</p>
-          </div>
-          <div className="settings-group settings-group--appearance">
-            <fieldset className="settings-appearance-fieldset">
-              <legend className="sr-only">Appearance</legend>
-              <div className="settings-appearance-options">
-                <label className={appearanceDraft === "system" ? "settings-appearance-option is-selected" : "settings-appearance-option"}>
-                  <input type="radio" name="settings-appearance" value="system" checked={appearanceDraft === "system"} onChange={() => { setAppearanceDraft("system"); setAppearanceSaved(false); }} />
-                  <Monitor size={16} aria-hidden="true" />
-                  <span><strong>System</strong><small>Follow this Mac · Currently {resolvedTheme}</small></span>
-                </label>
-                <label className={appearanceDraft === "light" ? "settings-appearance-option is-selected" : "settings-appearance-option"}>
-                  <input type="radio" name="settings-appearance" value="light" checked={appearanceDraft === "light"} onChange={() => { setAppearanceDraft("light"); setAppearanceSaved(false); }} />
-                  <Sun size={16} aria-hidden="true" />
-                  <span><strong>Light</strong><small>Always use the light workspace</small></span>
-                </label>
-                <label className={appearanceDraft === "dark" ? "settings-appearance-option is-selected" : "settings-appearance-option"}>
-                  <input type="radio" name="settings-appearance" value="dark" checked={appearanceDraft === "dark"} onChange={() => { setAppearanceDraft("dark"); setAppearanceSaved(false); }} />
-                  <Moon size={16} aria-hidden="true" />
-                  <span><strong>Dark</strong><small>Always use the dark workspace</small></span>
-                </label>
+        <hr className="settings-divider" />
+
+        {/* Appearance Section */}
+        <div className="settings-section">
+          <h2 className="settings-section-title">Appearance</h2>
+          <div className="settings-form-row">
+            <div className="settings-form-label">
+              <label>Theme</label>
+              <p className="settings-form-desc">Let SonIQ follow this Mac, or choose a fixed appearance.</p>
+            </div>
+            <div className="settings-form-control">
+              <div className="segmented-control" role="radiogroup" aria-label="Theme preference">
+                {appearanceOptions.map((opt) => {
+                  const isActive = themePreference === opt.value;
+                  return (
+                    <motion.button
+                      key={opt.value}
+                      role="radio"
+                      aria-checked={isActive}
+                      className={`segmented-btn ${isActive ? "is-active" : ""}`}
+                      onClick={() => onSaveAppearance(opt.value as ThemePreference)}
+                      whileTap={{ scale: 0.96 }}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="appearance-active-bg"
+                          className="segmented-bg"
+                          transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
+                        />
+                      )}
+                      <span className="segmented-content">
+                        <opt.icon size={13} strokeWidth={2.5} />
+                        {opt.label}
+                      </span>
+                    </motion.button>
+                  );
+                })}
               </div>
-            </fieldset>
-            <div className="settings-action-row">
-              <Button type="button" variant="secondary" onClick={saveAppearance} disabled={!appearanceChanged}>Save appearance</Button>
-              <span className="settings-inline-status" role="status" aria-live="polite">{appearanceSaved ? "Appearance saved." : ""}</span>
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="settings-section settings-section--danger" aria-labelledby="settings-reset-title">
-          <div className="settings-section-heading">
-            <h2 id="settings-reset-title">Reset SonIQ</h2>
-            <p>Remove SonIQ’s local preferences and saved soundtrack history. Your original videos are never touched.</p>
-          </div>
-          <div className="settings-group settings-reset-group">
-            {!resetConfirming ? (
+        <hr className="settings-divider" />
+
+        {/* Danger Section */}
+        <div className="settings-section">
+          <h2 className="settings-section-title">Data Management</h2>
+          <div className="settings-form-row settings-form-row--danger">
+            <div className="settings-form-label">
+              <label>Reset SonIQ</label>
+              <p className="settings-form-desc">Clears all local settings and your scanned soundtrack history. Your original media files are never touched.</p>
+            </div>
+            <div className="settings-form-control">
               <Button type="button" variant="secondary" onClick={() => setResetConfirming(true)}>
-                <RotateCcw size={15} aria-hidden="true" />
-                Reset SonIQ…
+                Reset Data...
               </Button>
-            ) : (
-              <div className="settings-reset-confirmation" role="group" aria-label="Confirm resetting SonIQ">
-                <p><strong>Reset all local SonIQ data?</strong> This cannot be undone. It clears your name, appearance, saved scans, and soundtrack history, then returns you to first-run setup.</p>
-                <div className="settings-reset-actions">
-                  <Button type="button" variant="ghost" onClick={() => setResetConfirming(false)}>Cancel</Button>
-                  <button className="settings-danger-button" type="button" onClick={onReset}>
-                    <RotateCcw size={15} aria-hidden="true" />
-                    Reset SonIQ
-                  </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <AnimatePresence>
+        {resetConfirming && (
+          <motion.div
+            className="settings-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <motion.div
+              key="reset-confirm"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+              className="settings-reset-dialog"
+            >
+              <div className="settings-reset-dialog-content">
+                <AlertTriangle size={16} className="text-destructive" />
+                <div>
+                  <strong>Are you sure?</strong>
+                  <p>This action cannot be undone.</p>
                 </div>
               </div>
-            )}
-          </div>
-        </section>
-      </div>
+              <div className="settings-reset-dialog-actions">
+                <Button type="button" variant="ghost" onClick={() => setResetConfirming(false)}>
+                  Cancel
+                </Button>
+                <button className="settings-danger-button" onClick={() => {
+                  setResetConfirming(false);
+                  onReset();
+                }}>
+                  Confirm Reset
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </section>
   );
 }
-

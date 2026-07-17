@@ -37,17 +37,7 @@ export function SourceRow({ source }: { source: SourceVideo }) {
   );
 }
 
-export function DetailRow({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <div className="detail-row">
-      <span>{label}</span>
-      <div>
-        <strong>{value}</strong>
-        <small>{detail}</small>
-      </div>
-    </div>
-  );
-}
+
 
 export function IntakeCanvas({
   displayName,
@@ -129,23 +119,15 @@ export function PendingCanvas({
 }) {
   return (
     <section className="workspace-canvas state-canvas" aria-labelledby="screen-title">
-      <div className="canvas-main">
+      <div className="canvas-main canvas-main--centered">
         <ScreenHeader
-          title="Confirm this source"
-          detail="Your original file stays untouched. Standard matching uses a local fingerprint; enhanced recognition is an optional, experimental signature lookup."
+          title="Ready to scan"
+          detail="Your original file never leaves this Mac."
           preview={source.isFixture}
         />
+        
         <div className="group-surface">
           <SourceRow source={source} />
-          <DetailRow label="Local samples" value="Up to three short audio samples" detail="Created on this Mac and removed after the scan." />
-          <DetailRow label="Local lookup" value="Fingerprint and duration" detail="The source video and full audio are not uploaded." />
-          {enhancedRecognition && !source.isFixture && (
-            <DetailRow
-              label="Enhanced discovery"
-              value={"Up to " + maxEnhancedDiscoverySignatures + " local-activity moments"}
-              detail="SonIQ maps local acoustic activity first, then chooses distinct short moments. Exact checked ranges appear after the scan."
-            />
-          )}
           <label className={source.isFixture ? "enhanced-recognition-choice is-disabled" : "enhanced-recognition-choice"}>
             <input
               type="checkbox"
@@ -154,8 +136,8 @@ export function PendingCanvas({
               onChange={(event) => onEnhancedRecognitionChange(event.target.checked)}
             />
             <span>
-              <strong>Enhanced recognition <em>Experimental</em></strong>
-              <small>Selected by default for this demo. SonIQ maps local activity, then creates up to {maxEnhancedDiscoverySignatures} short recognition signatures on this Mac. It sends those signatures—not your video or raw PCM—to an unofficial Shazam-compatible endpoint. Turn this off for fingerprint-only recognition.</small>
+              <strong>Enhanced recognition</strong>
+              <small>Identifies tracks using short audio signatures. Turn this off for local fingerprint-only recognition.</small>
             </span>
           </label>
         </div>

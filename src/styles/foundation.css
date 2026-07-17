@@ -1,18 +1,18 @@
 :root {
   color-scheme: light;
-  --window: #fdfdfd;
+  --window: #F5F5F7;
   --surface: #ffffff;
-  --surface-subtle: #fafafa;
-  --control-fill: #f4f4f4;
-  --control-hover: #eeeeee;
-  --row-fill: #fafafa;
-  --separator: #ededf0;
-  --separator-strong: rgba(0, 0, 0, 0.08);
-  --foreground: #0d0d0d;
-  --strong: #171717;
-  --secondary: #6c6c6c;
-  --secondary-label: #696969;
-  --tertiary: #767676;
+  --surface-subtle: #f4f4f5;
+  --control-fill: #e4e4e7;
+  --control-hover: #d4d4d8;
+  --row-fill: #f4f4f5;
+  --separator: rgba(0, 0, 0, 0.12);
+  --separator-strong: rgba(0, 0, 0, 0.24);
+  --foreground: #111111;
+  --strong: #000000;
+  --secondary: #52525b;
+  --secondary-label: #3f3f46;
+  --tertiary: #71717a;
   --accent: #0071e2;
   --accent-fill: rgba(0, 113, 226, 0.1);
   --accent-fill-hover: rgba(0, 113, 226, 0.15);
@@ -79,15 +79,15 @@ input:focus-visible {
 .app-shell[data-theme="dark"],
 .onboarding-shell[data-theme="dark"] {
   color-scheme: dark;
-  --window: #111111;
-  --surface: #1b1b1b;
+  --window: #0F0F0F;
+  --surface: #161616;
   --surface-subtle: rgba(255, 255, 255, 0.04);
-  --control-fill: rgba(255, 255, 255, 0.06);
+  --control-fill: #262626;
   --control-hover: rgba(255, 255, 255, 0.1);
   --row-fill: rgba(255, 255, 255, 0.04);
-  --separator: #262626;
+  --separator: #252525;
   --separator-strong: rgba(255, 255, 255, 0.08);
-  --foreground: #fbfbfb;
+  --foreground: rgba(255, 255, 255, 0.92);
   --strong: #fbfbfb;
   --secondary: #979797;
   --secondary-label: #bdbdbd;

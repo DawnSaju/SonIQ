@@ -1,265 +1,253 @@
-/* Settings stays one quiet workspace canvas: grouped rows carry the controls,
-   while the reset is only made prominent after an explicit user request. */
+/* macOS Desktop Form Layout */
+
 .settings-view {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  position: relative;
 }
 
-.settings-header {
-  display: flex;
-  min-height: 90px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  border-bottom: 1px solid var(--separator);
-  padding: 18px 20px;
-}
-
-.settings-header h1,
-.settings-section-heading h2 {
-  margin: 0;
-  color: var(--foreground);
-  font-weight: 620;
-  letter-spacing: -0.025em;
-}
-
-.settings-header h1 {
-  font-size: 18px;
-}
-
-.settings-header p,
-.settings-section-heading p {
-  margin: 4px 0 0;
-  color: var(--secondary);
-  font-size: 12px;
-  line-height: 1.45;
-}
 
 .settings-content {
-  width: min(100%, 760px);
-  padding: 30px 28px 42px;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 60px 40px;
 }
 
-.settings-section + .settings-section {
-  margin-top: 32px;
+.settings-section {
+  margin-bottom: 40px;
 }
 
-.settings-section-heading {
-  margin-bottom: 11px;
-}
-
-.settings-section-heading h2 {
+.settings-section-title {
   font-size: 14px;
-}
-
-.settings-group {
-  overflow: hidden;
-  border: 1px solid var(--separator);
-  border-radius: 10px;
-  background: var(--surface);
-}
-
-.settings-field {
-  display: grid;
-  gap: 8px;
-  padding: 16px;
-}
-
-.settings-field > span,
-.settings-appearance-option strong {
+  font-weight: 600;
   color: var(--foreground);
-  font-size: 13px;
-  font-weight: 590;
+  margin: 0 0 24px;
+  letter-spacing: -0.01em;
 }
 
-.settings-field input {
-  width: min(100%, 360px);
-  min-height: 38px;
-  border: 1px solid var(--separator-strong);
-  border-radius: 8px;
-  padding: 0 11px;
+.settings-divider {
+  border: none;
+  border-top: 1px solid var(--separator);
+  margin: 40px 0;
+}
+
+.settings-form-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.settings-form-label {
+  flex: 1;
+  min-width: 200px;
+}
+
+.settings-form-label label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.settings-form-desc {
+  font-size: 12px;
+  color: var(--secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.settings-form-control {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Native Text Input */
+.mac-text-input {
+  width: 240px;
+  padding: 6px 10px;
+  font-size: 13px;
   color: var(--foreground);
   background: var(--control-fill);
-  font-size: 13px;
-  outline: 0;
-  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  border: 1px solid var(--separator-strong);
+  border-radius: 6px;
+  outline: none;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-.settings-field input::placeholder {
+.app-shell[data-theme="dark"] .mac-text-input {
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+}
+
+.mac-text-input:focus {
+  border-color: var(--focus-ring);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04), 0 0 0 2px rgba(0, 113, 226, 0.2);
+}
+
+.app-shell[data-theme="dark"] .mac-text-input:focus {
+  border-color: var(--focus-ring);
+  box-shadow: 0 0 0 1px var(--focus-ring);
+}
+
+.mac-text-input::placeholder {
   color: var(--tertiary);
 }
 
-.settings-field input:focus {
-  border-color: var(--focus-ring);
-  background: var(--surface);
-  box-shadow: 0 0 0 3px var(--accent-fill);
-}
-
-.settings-field small {
-  color: var(--secondary);
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.settings-action-row {
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  gap: 12px;
-  border-top: 1px solid var(--separator);
-  padding: 10px 16px;
-}
-
-.settings-inline-status {
-  min-height: 16px;
-  color: var(--secondary);
-  font-size: 12px;
-}
-
-.settings-appearance-fieldset {
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.settings-appearance-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.settings-appearance-option {
-  display: grid;
-  min-height: 94px;
-  grid-template-columns: 16px minmax(0, 1fr);
-  align-content: center;
-  align-items: start;
-  gap: 10px;
-  border-right: 1px solid var(--separator);
-  padding: 15px;
-  color: var(--secondary);
-  cursor: pointer;
-  transition: background-color 140ms ease, color 140ms ease, transform 100ms ease-out;
-}
-
-.settings-appearance-option:last-child {
-  border-right: 0;
-}
-
-.settings-appearance-option:hover {
-  background: var(--surface-subtle);
-  color: var(--foreground);
-}
-
-.settings-appearance-option:active {
-  transform: scale(0.985);
-}
-
-.settings-appearance-option.is-selected {
+.segmented-control {
+  display: inline-flex;
   background: var(--control-fill);
-}
-
-.settings-appearance-option:has(input:focus-visible) {
+  border-radius: 6px;
+  padding: 2px;
   position: relative;
-  z-index: 1;
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-.settings-appearance-option input {
-  width: 16px;
-  height: 16px;
-  margin: 1px 0 0;
-  accent-color: var(--accent);
+.app-shell[data-theme="dark"] .segmented-control {
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
-.settings-appearance-option > span {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.settings-appearance-option small {
-  color: var(--secondary);
-  font-size: 11px;
-  line-height: 1.35;
-}
-
-.settings-section--danger {
-  margin-top: 40px !important;
-}
-
-.settings-reset-group {
-  padding: 14px 16px;
-}
-
-.settings-reset-confirmation {
-  display: grid;
-  gap: 13px;
-}
-
-.settings-reset-confirmation p {
-  max-width: 610px;
-  margin: 0;
-  color: var(--secondary);
+.segmented-btn {
+  appearance: none;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  padding: 4px 14px;
   font-size: 12px;
-  line-height: 1.5;
-}
-
-.settings-reset-confirmation strong {
-  color: var(--foreground);
-  font-weight: 610;
-}
-
-.settings-reset-actions {
+  font-weight: 500;
+  color: var(--secondary);
+  position: relative;
+  cursor: pointer;
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  -webkit-user-select: none;
+  user-select: none;
+  min-height: 24px;
+}
+
+.segmented-btn.is-active {
+  color: var(--foreground);
+}
+
+.segmented-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  z-index: 2;
+}
+
+/* The active sliding pill background */
+.segmented-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--surface);
+  border-radius: 5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--separator);
+  z-index: 0;
+}
+
+.app-shell[data-theme="dark"] .segmented-bg {
+  background: #3a3a3a;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+
+.settings-modal-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px) saturate(140%);
+  z-index: 100;
+}
+
+.app-shell[data-theme="dark"] .settings-modal-overlay {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.settings-reset-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 16px;
+  width: 260px;
+  box-shadow: var(--canvas-shadow);
+}
+
+.app-shell[data-theme="dark"] .settings-reset-dialog {
+  background: #202020;
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), var(--canvas-shadow);
+}
+
+.settings-reset-dialog-content {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.settings-reset-dialog-content .text-destructive {
+  color: #d93025;
+  margin-top: 2px;
+}
+
+.app-shell[data-theme="dark"] .settings-reset-dialog-content .text-destructive {
+  color: #ff897a;
+}
+
+.settings-reset-dialog-content strong {
+  display: block;
+  font-size: 13px;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.settings-reset-dialog-content p {
+  font-size: 12px;
+  color: var(--secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.settings-reset-dialog-actions {
+  display: flex;
   justify-content: flex-end;
   gap: 8px;
+  margin-top: 4px;
 }
 
 .settings-danger-button {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 28px;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border: 1px solid rgba(180, 35, 24, 0.28);
-  border-radius: 999px;
-  padding: 0 14px;
-  color: #b42318;
-  background: transparent;
-  box-shadow: none;
+  border: none;
+  border-radius: 6px;
+  padding: 0 12px;
+  color: white;
+  background: #d93025;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 590;
   cursor: pointer;
-  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease, transform 100ms ease-out;
-}
-
-.settings-danger-button:hover {
-  border-color: rgba(180, 35, 24, 0.45);
-  background: rgba(180, 35, 24, 0.08);
-}
-
-.settings-danger-button:active {
-  transform: scale(0.97);
-}
-
-.settings-danger-button:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
 }
 
 .app-shell[data-theme="dark"] .settings-danger-button {
-  border-color: rgba(255, 180, 171, 0.38);
-  color: #ffb4ab;
-}
-
-.app-shell[data-theme="dark"] .settings-danger-button:hover {
-  border-color: rgba(255, 180, 171, 0.62);
-  background: rgba(255, 180, 171, 0.12);
-}
-
-.status-muted {
-  color: var(--tertiary) !important;
+  background: #ff5449;
 }

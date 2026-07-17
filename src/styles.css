@@ -3,7 +3,6 @@
 @import "./styles/foundation.css";
 @import "./features/shell/shell.css";
 @import "./features/onboarding/onboarding.css";
-@import "./features/workspace/layout.css";
 @import "./features/scan/intake.css";
 @import "./features/workspace/canvas-primitives.css";
 @import "./features/scan/scanning.css";
