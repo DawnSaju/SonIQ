@@ -109,7 +109,7 @@
   overflow: hidden;
   border: 1px solid var(--separator);
   border-radius: 10px;
-  background: var(--surface);
+  background: var(--surface-subtle);
 }
 
 .source-row,

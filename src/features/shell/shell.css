@@ -1,4 +1,7 @@
-/* Shared Figma-derived sidebar & workspace */
+.app-shell[data-theme="dark"] .app-workspace {
+  border-color: var(--separator);
+}
+
 .app-shell {
   display: flex;
   flex-direction: row;
@@ -88,7 +91,8 @@
   display: flex;
   flex: 1;
   padding: 22px 22px 22px 0;
-  min-width: 0; /* allows children to shrink */
+  min-width: 0;
+  /* allows children to shrink */
 }
 
 .app-workspace {
@@ -96,7 +100,7 @@
   flex-direction: column;
   flex: 1;
   background: var(--surface);
-  border: 1px solid var(--separator);
+  border: 1px solid transparent;
   border-radius: 12px;
   box-shadow: var(--canvas-shadow);
   overflow: hidden;
