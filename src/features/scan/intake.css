@@ -1,4 +1,3 @@
-/* Intake Canvas */
 .full-bleed-dropzone {
   flex: 1;
   display: flex;
@@ -65,3 +64,36 @@
   font-size: 11px;
 }
 
+.canvas-main--centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+.canvas-main--centered .screen-header {
+  text-align: center;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.canvas-main--centered .screen-header p {
+  margin: 8px auto 0;
+  max-width: 320px;
+}
+
+.canvas-main--centered .group-surface {
+  width: 100%;
+  margin: 0 0 32px 0;
+  text-align: left;
+}
+
+.canvas-main--centered .canvas-actions {
+  width: 100%;
+  margin: 0;
+  justify-content: flex-end;
+}
