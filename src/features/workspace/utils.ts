@@ -1,3 +1,5 @@
+import { isTauri } from "@tauri-apps/api/core";
+import { LazyStore } from "@tauri-apps/plugin-store";
 import { developmentFixture } from "../../lib/fixture";
 import type { TargetedRange } from "../../lib/soundtrack-map";
 import { removeSoniqOwnedStorage } from "../../lib/workspace-settings";
@@ -20,6 +22,8 @@ import type {
   Theme,
   ThemePreference,
 } from "./types";
+
+export const libraryStore = new LazyStore("library.json");
 
 export const previewScreens: AppScreen[] = ["import", "pending", "scanning", "review", "handoff"];
 export const onboardingKey = "soniq:onboarding-v4-complete";
@@ -59,9 +63,13 @@ export function removeLocal(key: string) {
   }
 }
 
-export function resetSoniqOwnedStorage() {
+export async function resetSoniqOwnedStorage() {
   try {
     removeSoniqOwnedStorage(window.localStorage);
+    if (isTauri()) {
+      await libraryStore.clear();
+      await libraryStore.save();
+    }
   } catch {
   }
 }
@@ -77,20 +85,68 @@ export function parseStoredArray(value: string | null): unknown[] {
   }
 }
 
-export function readSoundtrackRecords(): SoundtrackRecord[] {
+export async function readSoundtrackRecords(): Promise<SoundtrackRecord[]> {
+  let legacyRecords: SoundtrackRecord[] = [];
   const storedCurrent = readLocal(soundtrackHistoryKey);
   if (storedCurrent !== null) {
     try {
       const current: unknown = JSON.parse(storedCurrent);
-      if (Array.isArray(current)) return migrateSoundtrackHistory(current).records;
+      if (Array.isArray(current)) legacyRecords = migrateSoundtrackHistory(current).records;
+    } catch { }
+  } else {
+    legacyRecords = migrateSoundtrackHistory(parseStoredArray(readLocal(scanHistoryKey))).records;
+  }
+
+  if (isTauri()) {
+    try {
+      let migrationOccurred = false;
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
+        if (key?.startsWith("soniq:source-bookmark:")) {
+          const bookmark = window.localStorage.getItem(key);
+          if (bookmark) {
+            await libraryStore.set(key, bookmark);
+            migrationOccurred = true;
+          }
+          keysToRemove.push(key);
+        }
+      }
+      for (const key of keysToRemove) window.localStorage.removeItem(key);
+
+      const records = await libraryStore.get<SoundtrackRecord[]>("records");
+
+      if (!records || !Array.isArray(records)) {
+        if (legacyRecords.length > 0) {
+          await libraryStore.set("records", legacyRecords);
+          migrationOccurred = true;
+        }
+      }
+
+      if (migrationOccurred) {
+        await libraryStore.save();
+      }
+
+      if (records && Array.isArray(records)) return migrateSoundtrackHistory(records).records;
     } catch {
+      // Store failed to load, so we will fall back to returning the legacy payload
     }
   }
-  return migrateSoundtrackHistory(parseStoredArray(readLocal(scanHistoryKey))).records;
+
+  return legacyRecords;
 }
 
-export function persistSoundtrackRecords(records: SoundtrackRecord[]) {
-  writeLocal(soundtrackHistoryKey, serializeSoundtrackHistory(records));
+export async function persistSoundtrackRecords(records: SoundtrackRecord[]) {
+  if (isTauri()) {
+    try {
+      await libraryStore.set("records", records);
+      await libraryStore.save();
+    } catch {
+      // Ignore the errors only if the window is closed
+    }
+  } else {
+    writeLocal(soundtrackHistoryKey, serializeSoundtrackHistory(records));
+  }
 }
 
 export function recognitionMethodForCandidate(candidate: CandidateTrack): RecognitionMethod {
