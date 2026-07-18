@@ -193,3 +193,65 @@ pub(crate) fn save_cue_sheet(destination_path: String, content: String) -> Resul
         "SonIQ could not finish saving that cue-sheet file. No partial export was kept.".to_string()
     })
 }
+
+#[cfg(target_os = "macos")]
+#[tauri::command]
+pub(crate) fn create_bookmark(path: String) -> Result<String, String> {
+    use base64::prelude::*;
+    use objc2_foundation::{NSString, NSURLBookmarkCreationOptions, NSURL};
+
+    let url = NSURL::fileURLWithPath(&NSString::from_str(&path));
+
+    let bookmark = url
+        .bookmarkDataWithOptions_includingResourceValuesForKeys_relativeToURL_error(
+            NSURLBookmarkCreationOptions::empty(),
+            None,
+            None,
+        )
+        .map_err(|e| format!("SonIQ could not secure a bookmark for that file: {:?}", e))?;
+
+    let bytes = bookmark.to_vec();
+    Ok(BASE64_STANDARD.encode(bytes))
+}
+
+#[cfg(not(target_os = "macos"))]
+#[tauri::command]
+pub(crate) fn create_bookmark(path: String) -> Result<String, String> {
+    Ok(path)
+}
+
+#[cfg(target_os = "macos")]
+#[tauri::command]
+pub(crate) fn resolve_bookmark(bookmark_base64: String) -> Result<String, String> {
+    use base64::prelude::*;
+    use objc2::runtime::Bool;
+    use objc2_foundation::{NSData, NSURLBookmarkResolutionOptions, NSURL};
+
+    let decoded = BASE64_STANDARD
+        .decode(&bookmark_base64)
+        .map_err(|_| "SonIQ could not read that bookmark.".to_string())?;
+
+    let data = NSData::from_vec(decoded);
+
+    let mut is_stale: Bool = Bool::NO;
+    let url = unsafe {
+        NSURL::URLByResolvingBookmarkData_options_relativeToURL_bookmarkDataIsStale_error(
+            &data,
+            NSURLBookmarkResolutionOptions::WithoutUI,
+            None,
+            &mut is_stale as *mut _,
+        )
+        .map_err(|e| format!("SonIQ could not reconnect to that file: {:?}", e))?
+    };
+
+    let path = url
+        .path()
+        .ok_or_else(|| "The reconnected file does not have a valid local path.".to_string())?;
+    Ok(path.to_string())
+}
+
+#[cfg(not(target_os = "macos"))]
+#[tauri::command]
+pub(crate) fn resolve_bookmark(bookmark_base64: String) -> Result<String, String> {
+    Ok(bookmark_base64)
+}

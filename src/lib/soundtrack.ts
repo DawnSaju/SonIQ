@@ -510,7 +510,7 @@ export function createSoundtrackRecord(input: CreateSoundtrackRecordInput): Soun
     sourceAvailability: sanitizeSourceAvailability(input.sourceAvailability),
     entries,
     receipt: sanitizeReceipt(input.receipt, fallbackReceipt),
-    coverEntryId: input.coverEntryId,
+    ...(input.coverEntryId ? { coverEntryId: text(input.coverEntryId, 160) } : {}),
     createdAt,
     updatedAt,
   };
@@ -550,6 +550,8 @@ export function parseSoundtrackRecord(value: unknown): SoundtrackRecord | null {
     sourceAvailability: sanitizeSourceAvailability(raw.sourceAvailability),
     entries,
     receipt: sanitizeReceipt(raw.receipt, fallbackReceipt),
+    ...(typeof raw.coverEntryId === "string" ? { coverEntryId: text(raw.coverEntryId, 160) } : {}),
+
     createdAt,
     updatedAt,
   };
