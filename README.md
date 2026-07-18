@@ -2,7 +2,7 @@
 
 ## Description
 
-SonIQ is a local macOS app for discovering music in videos you choose. It creates on device audio fingerprints and lets you save discovered tracks directly to your Spotify or Apple Music playlists. Your videos never leave your Mac.
+SonIQ is a local macOS app for discovering music in videos you choose. It creates on device audio fingerprints and lets you save discovered tracks directly to your Spotify or YouTube playlists. Your videos never leave your Mac.
 
 ## Stack
 
