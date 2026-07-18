@@ -33,5 +33,12 @@
     "active": true,
     "targets": "all",
     "icon": ["icons/icon.icns"]
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["soniq"]
+      }
+    }
   }
 }
