@@ -40,6 +40,10 @@
   gap: 32px;
 }
 
+.settings-form-row + .settings-form-row {
+  margin-top: 24px;
+}
+
 .settings-form-label {
   flex: 1;
   min-width: 200px;

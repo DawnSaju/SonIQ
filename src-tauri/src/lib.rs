@@ -17,6 +17,7 @@ use state::ScanController;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_deep_link::init())
         .manage(ScanController::default())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
@@ -32,7 +33,8 @@ pub fn run() {
             commands::cancel_active_scan,
             commands::cancel_active_waveform,
             commands::create_bookmark,
-            commands::resolve_bookmark
+            commands::resolve_bookmark,
+            media::fetch_spotify
         ])
         .run(tauri::generate_context!())
         .expect("error while running SonIQ");

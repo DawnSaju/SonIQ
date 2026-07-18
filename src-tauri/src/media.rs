@@ -61,7 +61,7 @@ pub(crate) fn extract_audio_sample(
         .arg(source)
         .arg("-t")
         .arg(format!("{:.3}", window.duration_seconds))
-        .args(["-vn", "-ac", "1", "-ar", "11025", "-c:a", "pcm_s16le", "-y"])
+        .args(["-vn", "-ac", "1", "-ar", "44100", "-c:a", "pcm_s16le", "-y"])
         .arg(destination);
 
     run_status(command, cancellation).map_err(|error| {
@@ -182,4 +182,41 @@ pub(crate) fn create_fingerprint(
     }
 
     Ok(fingerprint)
+}
+
+#[tauri::command]
+pub(crate) async fn fetch_spotify(
+    url: String,
+    method: String,
+    headers: std::collections::HashMap<String, String>,
+    body: Option<String>,
+) -> Result<(u16, String), String> {
+    let client = reqwest::Client::new();
+    let mut req = match method.as_str() {
+        "POST" => client.post(&url),
+        "PUT" => client.put(&url),
+        "DELETE" => client.delete(&url),
+        _ => client.get(&url),
+    };
+
+    for (k, v) in headers {
+        req = req.header(&k, &v);
+    }
+
+    if let Some(b) = body {
+        req = req.body(b);
+    }
+
+    let res = req
+        .send()
+        .await
+        .map_err(|e| format!("Reqwest failed: {}", e))?;
+
+    let status = res.status().as_u16();
+    let text = res
+        .text()
+        .await
+        .map_err(|e| format!("Failed to read body: {}", e))?;
+
+    Ok((status, text))
 }
