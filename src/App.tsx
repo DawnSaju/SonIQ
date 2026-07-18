@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import { open, save } from "@tauri-apps/plugin-dialog";
+import { open, save, message } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { developmentFixture } from "./lib/fixture";
 import type { TargetedRange } from "./lib/soundtrack-map";
@@ -18,6 +19,9 @@ import {
   type SoundtrackEntry,
   type SoundtrackRecord,
 } from "./lib/soundtrack";
+import { getAuthData, getSpotifyAuthUrl, exchangeCodeForToken, clearAuthData } from "./lib/spotify-auth";
+import { exportSoundtrack } from "./lib/spotify-api";
+import { exportToYouTube } from "./lib/youtube-api";
 import {
   fixtureCandidates,
   getInitialOnboarding,
@@ -83,6 +87,13 @@ export default function App() {
   const [previewRecord, setPreviewRecord] = useState<SoundtrackRecord | null>(null);
   const [activeRecordId, setActiveRecordId] = useState<string | null>(null);
   const [enhancedRecognition, setEnhancedRecognition] = useState(true);
+  const [spotifyAuthLoading, setSpotifyAuthLoading] = useState(false);
+  const [isSpotifyConnected, setIsSpotifyConnected] = useState(false);
+  const [spotifyExportState, setSpotifyExportState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [spotifyExportError, setSpotifyExportError] = useState<string | null>(null);
+  const [exportPlatform, setExportPlatform] = useState<"spotify" | "youtube">("youtube");
+  const [youtubeExportState, setYoutubeExportState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [youtubeExportError, setYoutubeExportError] = useState<string | null>(null);
   const [source, setSource] = useState<SourceVideo | null>(() => {
     const requested = new URLSearchParams(window.location.search).get("preview");
     return requested && previewScreens.includes(requested as AppScreen) && requested !== "import"
@@ -114,6 +125,106 @@ export default function App() {
     copyCueSheet: async () => { },
     cancelScan: async () => { },
   });
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+
+    const handleAuthCode = (code: string) => {
+      setSpotifyAuthLoading(true);
+      exchangeCodeForToken(code)
+        .then(() => {
+          setSpotifyAuthLoading(false);
+          setIsSpotifyConnected(true);
+        })
+        .catch((err) => {
+          console.error("Spotify auth failed:", err);
+          setSpotifyAuthLoading(false);
+        });
+    };
+
+    onOpenUrl((urls) => {
+      const url = urls[0];
+      if (url && url.startsWith("soniq://callback")) {
+        const parsed = new URL(url);
+        const code = parsed.searchParams.get("code");
+        if (code) handleAuthCode(code);
+      }
+    }).then(u => { unlisten = u; });
+
+    const parsedParams = new URLSearchParams(window.location.search);
+    const code = parsedParams.get("code");
+    if (code) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      handleAuthCode(code);
+    }
+
+    getAuthData().then((data) => {
+      if (data) setIsSpotifyConnected(true);
+    }).catch(() => { /* not connected or expired */ });
+
+    return () => { if (unlisten) unlisten(); };
+  }, []);
+
+  const handleSpotifyConnect = async () => {
+    try {
+      setSpotifyAuthLoading(true);
+      const { url } = await getSpotifyAuthUrl();
+      await openUrl(url);
+    } catch (err) {
+      console.error(err);
+      setSpotifyAuthLoading(false);
+    }
+  };
+
+  const handleSpotifyDisconnect = async () => {
+    await clearAuthData();
+    setIsSpotifyConnected(false);
+  };
+
+  const handleSpotifyExport = async (record: SoundtrackRecord) => {
+    try {
+      setSpotifyExportState("loading");
+      const name = `SonIQ Playlist (${new Date().toLocaleDateString()})`;
+      const entries = record.entries.filter(e => e.selection === "kept");
+      await exportSoundtrack(name, entries);
+      setSpotifyExportState("success");
+      setTimeout(() => setSpotifyExportState("idle"), 3000);
+    } catch (err: any) {
+      console.error(err);
+      const errorMsg = err.message || String(err);
+      setSpotifyExportError(errorMsg);
+      setSpotifyExportState("error");
+
+      if (isTauri()) {
+        await message(errorMsg, { title: 'Spotify Export Failed', kind: 'error' });
+      }
+
+      setTimeout(() => setSpotifyExportState("idle"), 5000);
+    }
+  };
+
+  const handleYouTubeExport = async (record: SoundtrackRecord) => {
+    try {
+      setYoutubeExportState("loading");
+      const entries = record.entries.filter(e => e.selection === "kept");
+      const url = await exportToYouTube(entries);
+      setYoutubeExportState("success");
+      await openUrl(url);
+      setTimeout(() => setYoutubeExportState("idle"), 3000); // Reset after 3 seconds
+    } catch (err: any) {
+      console.error(err);
+      const errorMsg = err.message || String(err);
+      setYoutubeExportError(errorMsg);
+      setYoutubeExportState("error");
+
+      if (isTauri()) {
+        await message(errorMsg, { title: 'YouTube Export Failed', kind: 'error' });
+      } else {
+        window.alert("YouTube Export Failed: " + errorMsg);
+      }
+      setTimeout(() => setYoutubeExportState("idle"), 5000);
+    }
+  };
 
   const activeRecord = useMemo(
     () => previewRecord ?? records.find((record) => record.id === activeRecordId) ?? null,
@@ -973,12 +1084,12 @@ export default function App() {
             <div className="app-workspace">
               <WorkspaceToolbar activeView={activeView} context={toolbarContext} theme={theme} viewMode={libraryViewMode} onToggleTheme={() => setAppearance(theme === "light" ? "dark" : "light")} onToggleViewMode={setLibraryViewMode} />
               <div className="workspace-canvas">
-                {activeView === "settings" && <SettingsCanvas displayName={displayName} themePreference={themePreference} resolvedTheme={theme} onSaveName={saveDisplayName} onSaveAppearance={setAppearance} onBackToWorkspace={returnToWorkspace} onReset={resetSoniq} />}
+                {activeView === "settings" && <SettingsCanvas displayName={displayName} themePreference={themePreference} resolvedTheme={theme} onSaveName={saveDisplayName} onSaveAppearance={setAppearance} onBackToWorkspace={returnToWorkspace} onReset={resetSoniq} isSpotifyConnected={isSpotifyConnected} spotifyAuthLoading={spotifyAuthLoading} onSpotifyConnect={handleSpotifyConnect} onSpotifyDisconnect={handleSpotifyDisconnect} exportPlatform={exportPlatform} onExportPlatformChange={setExportPlatform} />}
                 {activeView === "library" && <SoundtrackLibraryCanvas records={records} viewMode={libraryViewMode} onNewScan={startNewScan} onOpen={openRecord} onDelete={deleteRecord} onRename={renameRecord} onSetCover={setRecordCover} deletedRecord={deletedRecord} onUndoDelete={undoDeleteRecord} />}
                 {activeView === "scan" && screen === "import" && <IntakeCanvas displayName={displayName} onSelect={chooseVideo} onDrop={onDrop} dragActive={dragActive} onDragChange={setDragActive} validationMessage={validationMessage} />}
                 {activeView === "scan" && screen === "pending" && source && <PendingCanvas source={source} notice={scanNotice} enhancedRecognition={enhancedRecognition} onBack={startNewScan} onEnhancedRecognitionChange={setEnhancedRecognition} onStart={startScan} />}
                 {activeView === "scan" && screen === "scanning" && source && <ScanningCanvas source={source} progress={scanProgress} enhancedRecognition={enhancedRecognition} onCancel={cancelScan} onNext={completeFixtureScan} />}
-                {activeView === "scan" && screen === "review" && activeRecord && visibleSource && <RecoveryReviewCanvas source={visibleSource} record={activeRecord} map={activeRuntimeMap} message={reviewMessage || "No reliable matches were returned for this scan."} sourceAvailable={sourceAvailable} onToggleKept={toggleEntryKept} onEdit={editEntry} onRemove={removeEntry} onUndoRemove={undoRemoveEntry} onAddManual={addManualEntry} onOpenMomentFinder={openMomentFinder} onReconnect={reconnectSource} onContinue={() => setScreen("handoff")} onNewScan={startNewScan} />}
+                {activeView === "scan" && screen === "review" && activeRecord && visibleSource && <RecoveryReviewCanvas source={visibleSource} record={activeRecord} map={activeRuntimeMap} message={reviewMessage || "No reliable matches were returned for this scan."} sourceAvailable={sourceAvailable} onToggleKept={toggleEntryKept} onEdit={editEntry} onRemove={removeEntry} onUndoRemove={undoRemoveEntry} onAddManual={addManualEntry} onOpenMomentFinder={openMomentFinder} onReconnect={reconnectSource} onContinue={() => setScreen("handoff")} onNewScan={startNewScan} isSpotifyConnected={isSpotifyConnected} spotifyAuthLoading={spotifyAuthLoading} spotifyExportState={spotifyExportState} spotifyExportError={spotifyExportError} onSpotifyConnect={handleSpotifyConnect} onSpotifyExport={() => handleSpotifyExport(activeRecord)} exportPlatform={exportPlatform} youtubeExportState={youtubeExportState} youtubeExportError={youtubeExportError} onYouTubeExport={() => handleYouTubeExport(activeRecord)} />}
                 {activeView === "scan" && screen === "moments" && activeRecord && visibleSource && <MomentFinderCanvas source={visibleSource} record={activeRecord} waveform={waveform} waveformLoading={waveformLoading} enhancedRecognition={enhancedRecognition} initialRange={pendingMomentRange} onEnhancedRecognitionChange={setEnhancedRecognition} onStartTargetedRecovery={runTargetedRecovery} onCancelRecovery={() => { void cancelScan(); }} notice={scanNotice} onBack={leaveMomentFinder} />}
                 {activeView === "scan" && screen === "handoff" && activeRecord && <CueSheetCanvas record={activeRecord} copyState={copyState} exportState={exportState} onCopy={copyCueSheet} onExport={exportCueSheet} onOpenSpotify={openSpotifySearch} onBack={() => setScreen("review")} onRestart={startNewScan} />}
               </div>

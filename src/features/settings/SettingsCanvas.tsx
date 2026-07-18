@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Monitor, Moon, Sun, AlertTriangle } from "lucide-react";
+import { Monitor, Moon, Sun, AlertTriangle, Youtube, Music2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "../../components/ui/button";
 import type { Theme, ThemePreference } from "../workspace/types";
@@ -18,6 +18,12 @@ export function SettingsCanvas({
   onSaveAppearance,
   onBackToWorkspace,
   onReset,
+  isSpotifyConnected,
+  spotifyAuthLoading,
+  onSpotifyConnect,
+  onSpotifyDisconnect,
+  exportPlatform,
+  onExportPlatformChange,
 }: {
   displayName: string;
   themePreference: ThemePreference;
@@ -26,6 +32,12 @@ export function SettingsCanvas({
   onSaveAppearance: (appearance: ThemePreference) => void;
   onBackToWorkspace: () => void;
   onReset: () => void;
+  isSpotifyConnected?: boolean;
+  spotifyAuthLoading?: boolean;
+  onSpotifyConnect?: () => void;
+  onSpotifyDisconnect?: () => void;
+  exportPlatform?: "spotify" | "youtube";
+  onExportPlatformChange?: (platform: "spotify" | "youtube") => void;
 }) {
   const [nameDraft, setNameDraft] = useState(displayName);
   const [resetConfirming, setResetConfirming] = useState(false);
@@ -115,6 +127,80 @@ export function SettingsCanvas({
               </div>
             </div>
           </div>
+        </div>
+
+        <hr className="settings-divider" />
+
+        {/* Integrations Section */}
+        <div className="settings-section">
+          <h2 className="settings-section-title">Integrations</h2>
+          
+          <div className="settings-form-row">
+            <div className="settings-form-label">
+              <label>Default Export Platform</label>
+              <p className="settings-form-desc">Choose where to export your soundtracks by default.</p>
+            </div>
+            <div className="settings-form-control">
+              <div className="segmented-control" role="radiogroup" aria-label="Default Export Platform">
+                {[{ value: "youtube", label: "YouTube (Free)", icon: Youtube }, { value: "spotify", label: "Spotify", icon: Music2 }].map((opt) => {
+                  const isActive = (exportPlatform || "youtube") === opt.value;
+                  
+                  return (
+                    <motion.button
+                      key={opt.value}
+                      role="radio"
+                      aria-checked={isActive}
+                      className={`segmented-btn ${isActive ? "is-active" : ""}`}
+                      onClick={() => onExportPlatformChange?.(opt.value as "youtube" | "spotify")}
+                      whileTap={{ scale: 0.96 }}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="platform-active-bg"
+                          className="segmented-bg"
+                          transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
+                        />
+                      )}
+                      <span className="segmented-content">
+                        <opt.icon size={13} strokeWidth={2.5} />
+                        {opt.label}
+                      </span>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          <AnimatePresence initial={false}>
+            {exportPlatform === "spotify" && (
+              <motion.div 
+                className="settings-form-row"
+                initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                animate={{ height: "auto", opacity: 1, marginTop: 24 }}
+                exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                style={{ overflow: 'hidden' }}
+              >
+                <div className="settings-form-label">
+                  <label>Spotify Connection</label>
+                  <p className="settings-form-desc">Export your completed soundtracks to Spotify.</p>
+                </div>
+                <div className="settings-form-control">
+                  {isSpotifyConnected ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="quiet-note">Connected</span>
+                      <Button type="button" variant="secondary" onClick={onSpotifyDisconnect}>Disconnect</Button>
+                    </div>
+                  ) : (
+                    <Button type="button" variant="secondary" onClick={onSpotifyConnect} disabled={spotifyAuthLoading}>
+                      {spotifyAuthLoading ? "Connecting..." : "Connect Spotify"}
+                    </Button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <hr className="settings-divider" />

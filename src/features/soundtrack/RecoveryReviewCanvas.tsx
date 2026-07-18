@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { Check, CheckCheck, ChevronRight, ExternalLink, FileVideo, MapPin, Music2, Pencil, Plus, Trash2 } from "lucide-react";
+import { AlertTriangle, Check, CheckCheck, ChevronRight, ExternalLink, FileVideo, MapPin, Music2, Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { clampTimelinePercent, normalizeMomentSelection, timeRangeStyle, type RuntimeSoundtrackMap, type TargetedRange } from "../../lib/soundtrack-map";
 import { createCueSheet, createSoundtrackId, formatCueTimestamp, type SoundtrackEntry, type SoundtrackRecord } from "../../lib/soundtrack";
@@ -182,6 +182,16 @@ export function RecoveryReviewCanvas({
   onReconnect,
   onContinue,
   onNewScan,
+  isSpotifyConnected,
+  spotifyAuthLoading,
+  spotifyExportState,
+  spotifyExportError,
+  onSpotifyConnect,
+  onSpotifyExport,
+  exportPlatform,
+  youtubeExportState,
+  youtubeExportError,
+  onYouTubeExport,
 }: {
   source: SourceVideo;
   record: SoundtrackRecord;
@@ -197,6 +207,16 @@ export function RecoveryReviewCanvas({
   onReconnect: () => void;
   onContinue: () => void;
   onNewScan: () => void;
+  isSpotifyConnected?: boolean;
+  spotifyAuthLoading?: boolean;
+  spotifyExportState?: "idle" | "loading" | "success" | "error";
+  spotifyExportError?: string | null;
+  onSpotifyConnect?: () => void;
+  onSpotifyExport?: () => void;
+  exportPlatform?: "spotify" | "youtube";
+  youtubeExportState?: "idle" | "loading" | "success" | "error";
+  youtubeExportError?: string | null;
+  onYouTubeExport?: () => void;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState<EntryEdits | null>(null);
@@ -555,11 +575,31 @@ export function RecoveryReviewCanvas({
         </div>
       </div>
       <div className="floating-action-bar">
-        <Button type="button" variant="secondary" onClick={() => setShowManualForm(true)}><Plus size={15} aria-hidden="true" />Add track</Button>
-        {sourceAvailable ? (
-          <Button type="button" variant="secondary" onClick={() => onOpenMomentFinder()}><MapPin size={15} aria-hidden="true" />Find a moment</Button>
-        ) : (
-          <Button type="button" variant="secondary" onClick={onReconnect}><MapPin size={15} aria-hidden="true" />Reconnect video</Button>
+        {(!exportPlatform || exportPlatform === "youtube" || isSpotifyConnected) && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+
+            <Button 
+              type="button" 
+              variant="secondary" 
+              className={`spotify-export-btn ${(exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "error" ? "text-red-500" : ""}`}
+              onClick={exportPlatform === "spotify" ? onSpotifyExport : onYouTubeExport}
+              disabled={
+                (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "loading" || 
+                (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "success" || 
+                !cueSheet.length
+              }
+            >
+              {(exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "loading" ? "Exporting..." : 
+               (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "success" ? <><Check size={15} />Exported</> :
+               (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "error" ? <><AlertTriangle size={15} />Export Failed</> :
+               <><FileVideo size={15} />Export Playlist</>}
+            </Button>
+          {(exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "error" && (
+            <span className="text-red-500 text-xs mt-1" style={{ maxWidth: '300px', textAlign: 'center' }}>
+              {exportPlatform === "spotify" ? spotifyExportError : youtubeExportError}
+            </span>
+          )}
+        </div>
         )}
         <Button type="button" onClick={onContinue}>{cueSheet.length ? "Open cue sheet" : "Finish soundtrack"}<ChevronRight size={16} aria-hidden="true" /></Button>
       </div>
