@@ -7,7 +7,6 @@ import { clampTimelinePercent, normalizeMomentSelection, timeRangeStyle, type Ru
 import { createCueSheet, createSoundtrackId, formatCueTimestamp, type SoundtrackEntry, type SoundtrackRecord } from "../../lib/soundtrack";
 import { formatTimeRange, formatTimestamp, pluralizeMoments } from "../workspace/utils";
 import type { ActiveTrackPreview, EntryEdits, SourceVideo, TrackPreview } from "../workspace/types";
-import { ScreenHeader } from "../scan/ScanCanvases";
 import { TrackArtwork } from "./TrackArtwork";
 
 export function recoveryStateLabel(entry: SoundtrackEntry) {
@@ -112,9 +111,6 @@ export function SoundtrackMapSurface({
   }));
   const actionItems = [...activityItems, ...checkedItems, ...evidenceItems];
   const mapUnavailable = !map?.available;
-  const mapDetail = mapUnavailable
-    ? "This session has no retained local activity map. Checked moments and track evidence remain visible."
-    : "Local activity and only the moments SonIQ actually checked. Activity is not a claim that a region is music.";
 
   function canInspect(range: TargetedRange) {
     return sourceAvailable ? normalizeMomentSelection(range, duration) : null;
@@ -154,64 +150,19 @@ export function SoundtrackMapSurface({
   }
 
   return (
-    <section className="soundtrack-map-surface" aria-labelledby="soundtrack-map-title">
-      <div className="soundtrack-map-heading">
-        <div>
-          <h2 id="soundtrack-map-title">Soundtrack Map</h2>
-          <p>{mapDetail}</p>
-        </div>
-        <span className="soundtrack-map-source" title={source.fileName}>
-          <FileVideo size={13} aria-hidden="true" />
-          {source.fileName}
-        </span>
-      </div>
-      <div className="soundtrack-map-legend" aria-label="Map legend">
-        <span><i className="soundtrack-map-key soundtrack-map-key--activity" aria-hidden="true" />Local activity</span>
-        <span><i className="soundtrack-map-key soundtrack-map-key--checked" aria-hidden="true" />Checked</span>
-        <span><i className="soundtrack-map-key soundtrack-map-key--evidence" aria-hidden="true" />Track evidence</span>
-        <span><i className="soundtrack-map-key soundtrack-map-key--gap" aria-hidden="true" />Not checked</span>
-      </div>
-      {duration > 0 ? (
+    <section className="timeline-scrubber-surface" aria-label="Soundtrack Map">
+      {duration > 0 && (
         <>
-          <div className="soundtrack-map-lanes" aria-label="Source-relative soundtrack evidence">
-            <div className="soundtrack-map-lane">
-              <span className="soundtrack-map-lane-label">Activity</span>
-              <div className="soundtrack-map-track" aria-label={mapUnavailable ? "No local activity map available" : "Local acoustic activity"}>
-                {activityItems.length ? activityItems.map((item) => timelineRange(item)) : <span className="soundtrack-map-empty-lane">{mapUnavailable ? "Not retained" : "No distinct activity"}</span>}
-              </div>
+          <div className="timeline-track-container" aria-label="Soundtrack evidence timeline">
+            <div className="timeline-track">
+              {activityItems.map((item) => timelineRange(item))}
+              {checkedItems.map((item) => timelineRange(item))}
+              {evidenceItems.map((item) => timelineRange(item, true))}
             </div>
-            <div className="soundtrack-map-lane">
-              <span className="soundtrack-map-lane-label">Checked</span>
-              <div className="soundtrack-map-track" aria-label="Enhanced recognition coverage">
-                {checkedItems.length ? checkedItems.map((item) => timelineRange(item)) : <span className="soundtrack-map-empty-lane">No enhanced checks</span>}
-              </div>
-            </div>
-            <div className="soundtrack-map-lane">
-              <span className="soundtrack-map-lane-label">Evidence</span>
-              <div className="soundtrack-map-track" aria-label="Recovered track evidence">
-                {evidenceItems.length ? evidenceItems.map((item) => timelineRange(item, true)) : <span className="soundtrack-map-empty-lane">No track evidence yet</span>}
-              </div>
-            </div>
-            <div className="soundtrack-map-axis" aria-hidden="true"><span>00:00</span><span>{formatTimestamp(duration)}</span></div>
+            <div className="timeline-axis" aria-hidden="true"><span>00:00</span><span>{formatTimestamp(duration)}</span></div>
           </div>
-          <ul className="soundtrack-map-timestamp-list" aria-label="Soundtrack map timestamp list">
-            {actionItems.length ? actionItems.map((item) => {
-              const selection = canInspect(item.range);
-              const content = <><strong>{item.label}</strong><small>{formatTimeRange(item.range)} · {item.detail}</small></>;
-              return (
-                <li key={item.id}>
-                  {selection ? <button type="button" onClick={() => onOpenMomentFinder(selection)}>{content}</button> : <span>{content}</span>}
-                </li>
-              );
-            }) : <li><span><strong>No moment evidence yet</strong><small>Try a specific moment when a connected source is available.</small></span></li>}
-          </ul>
         </>
-      ) : (
-        <p className="soundtrack-map-unavailable">SonIQ needs the source duration to place map evidence on a timeline.</p>
       )}
-      <p className="soundtrack-map-hint">
-        {sourceAvailable ? "Select an activity, checked range, or evidence marker to inspect it in Moment Finder. Nothing starts until you choose Try this moment." : "Reconnect the source video to inspect a moment. This saved view never invents local activity data."}
-      </p>
     </section>
   );
 }
@@ -436,20 +387,12 @@ export function RecoveryReviewCanvas({
   }
 
   return (
-    <section className="workspace-canvas review-canvas" aria-labelledby="screen-title">
-      <div className="canvas-main">
-        <ScreenHeader
-          title="Recover this soundtrack"
-          detail="Keep what is right, correct what is uncertain, or add what recognition missed. Only kept tracks appear in your cue sheet."
-          preview={source.isFixture}
-        />
-        {!sourceAvailable && (
-          <div className="review-toast" role="status">
-            <span>This saved soundtrack has no connected source video. Its cue sheet and receipt remain available.</span>
-            <button type="button" onClick={onReconnect}>Reconnect source</button>
-          </div>
-        )}
-        {activeEntries.length > 0 && message && <p className="review-scan-note" role="status">{message}</p>}
+    <section className="workspace-canvas review-canvas" aria-label="Recovery Review">
+      <div className="canvas-main-constrained">
+        <div className="review-top-bar">
+          <h1 className="review-title">{source.fileName}</h1>
+          <span className="review-subtitle">{activeEntries.length} {activeEntries.length === 1 ? "track" : "tracks"} recognized</span>
+        </div>
         <SoundtrackMapSurface source={source} record={record} map={map} sourceAvailable={sourceAvailable} onOpenMomentFinder={onOpenMomentFinder} />
         {showManualForm && (
           <form
@@ -482,11 +425,7 @@ export function RecoveryReviewCanvas({
           </form>
         )}
         {activeEntries.length > 0 ? (
-          <div className="group-surface track-group">
-            <div className="group-label-row">
-              <span>{activeEntries.length + " " + (activeEntries.length === 1 ? "recovered track" : "recovered tracks")}{checkedSignatureCount ? " · " + checkedSignatureCount + " " + pluralizeMoments(checkedSignatureCount) + " checked" : ""}</span>
-              <span title={source.fileName}><FileVideo size={13} aria-hidden="true" />{source.fileName}</span>
-            </div>
+          <div className="track-group edge-to-edge">
             <ul className="track-list" aria-label="Soundtrack entries">
               {activeEntries.map((entry, index) => {
                 const isEditing = editingId === entry.id;
@@ -596,25 +535,33 @@ export function RecoveryReviewCanvas({
             <p>{message}</p>
             <div className="review-empty-actions">
               <Button type="button" onClick={() => setShowManualForm(true)}><Plus size={15} aria-hidden="true" />Add a track manually</Button>
-              {sourceAvailable && <Button type="button" variant="secondary" onClick={() => onOpenMomentFinder()}><MapPin size={15} aria-hidden="true" />Try a moment</Button>}
+              {sourceAvailable ? (
+                <Button type="button" variant="secondary" onClick={() => onOpenMomentFinder()}><MapPin size={15} aria-hidden="true" />Try a moment</Button>
+              ) : (
+                <Button type="button" variant="secondary" onClick={onReconnect}><MapPin size={15} aria-hidden="true" />Reconnect video</Button>
+              )}
               <Button type="button" variant="ghost" onClick={onNewScan}>Choose another video</Button>
             </div>
           </div>
         )}
         {removedId && removedEntries.some((entry) => entry.id === removedId) && (
-          <div className="review-toast" role="status">
+          <div className="review-toast review-toast--inline" role="status">
             <span>{removedEntries.find((entry) => entry.id === removedId)?.title ?? "Track"} is removed from the cue sheet.</span>
             <button ref={undoButtonRef} type="button" onClick={() => { onUndoRemove(removedId); setRemovedId(null); }}>Undo</button>
           </div>
         )}
         <div className="canvas-actions">
           <span className="quiet-note">{cueSheet.length ? "Your cue sheet includes only kept tracks." : "You can finish with an intentionally empty soundtrack."}</span>
-          <div className="recovery-toolbar-actions">
-            <Button type="button" variant="secondary" onClick={() => setShowManualForm(true)}><Plus size={15} aria-hidden="true" />Add track</Button>
-            <Button type="button" variant="secondary" onClick={() => onOpenMomentFinder()} disabled={!sourceAvailable}><MapPin size={15} aria-hidden="true" />Find a moment</Button>
-            <Button type="button" onClick={onContinue}>{cueSheet.length ? "Open cue sheet" : "Finish soundtrack"}<ChevronRight size={16} aria-hidden="true" /></Button>
-          </div>
         </div>
+      </div>
+      <div className="floating-action-bar">
+        <Button type="button" variant="secondary" onClick={() => setShowManualForm(true)}><Plus size={15} aria-hidden="true" />Add track</Button>
+        {sourceAvailable ? (
+          <Button type="button" variant="secondary" onClick={() => onOpenMomentFinder()}><MapPin size={15} aria-hidden="true" />Find a moment</Button>
+        ) : (
+          <Button type="button" variant="secondary" onClick={onReconnect}><MapPin size={15} aria-hidden="true" />Reconnect video</Button>
+        )}
+        <Button type="button" onClick={onContinue}>{cueSheet.length ? "Open cue sheet" : "Finish soundtrack"}<ChevronRight size={16} aria-hidden="true" /></Button>
       </div>
     </section>
   );

@@ -720,6 +720,17 @@ export default function App() {
     }));
   }
 
+  function setRecordCover(record: SoundtrackRecord, coverEntryId: string) {
+    updateRecords((current) => current.map((item) => {
+      if (item.id !== record.id) return item;
+      return {
+        ...item,
+        coverEntryId,
+        updatedAt: new Date().toISOString()
+      };
+    }));
+  }
+
   function undoDeleteRecord() {
     if (!deletedRecord) return;
     updateRecords((current) => [deletedRecord, ...current.filter((record) => record.id !== deletedRecord.id)]);
@@ -873,7 +884,7 @@ export default function App() {
               <WorkspaceToolbar activeView={activeView} context={toolbarContext} theme={theme} viewMode={libraryViewMode} onToggleTheme={() => setAppearance(theme === "light" ? "dark" : "light")} onToggleViewMode={setLibraryViewMode} />
               <div className="workspace-canvas">
                 {activeView === "settings" && <SettingsCanvas displayName={displayName} themePreference={themePreference} resolvedTheme={theme} onSaveName={saveDisplayName} onSaveAppearance={setAppearance} onBackToWorkspace={returnToWorkspace} onReset={resetSoniq} />}
-                {activeView === "library" && <SoundtrackLibraryCanvas records={records} viewMode={libraryViewMode} onNewScan={startNewScan} onOpen={openRecord} onDelete={deleteRecord} onRename={renameRecord} deletedRecord={deletedRecord} onUndoDelete={undoDeleteRecord} />}
+                {activeView === "library" && <SoundtrackLibraryCanvas records={records} viewMode={libraryViewMode} onNewScan={startNewScan} onOpen={openRecord} onDelete={deleteRecord} onRename={renameRecord} onSetCover={setRecordCover} deletedRecord={deletedRecord} onUndoDelete={undoDeleteRecord} />}
                 {activeView === "scan" && screen === "import" && <IntakeCanvas displayName={displayName} onSelect={chooseVideo} onDrop={onDrop} dragActive={dragActive} onDragChange={setDragActive} validationMessage={validationMessage} />}
                 {activeView === "scan" && screen === "pending" && source && <PendingCanvas source={source} notice={scanNotice} enhancedRecognition={enhancedRecognition} onBack={startNewScan} onEnhancedRecognitionChange={setEnhancedRecognition} onStart={startScan} />}
                 {activeView === "scan" && screen === "scanning" && source && <ScanningCanvas source={source} progress={scanProgress} enhancedRecognition={enhancedRecognition} onCancel={cancelScan} onNext={completeFixtureScan} />}

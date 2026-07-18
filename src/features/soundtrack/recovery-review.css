@@ -1,5 +1,39 @@
-.track-group .group-label-row {
-  min-height: 43px;
+.canvas-main-constrained {
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  padding-bottom: 120px;
+}
+
+.review-top-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 56px 24px 24px;
+  text-align: center;
+}
+
+.review-title {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.review-subtitle {
+  color: var(--tertiary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.track-group.edge-to-edge .group-label-row {
+  display: none; /* Removed the header for the track list completely */
+}
+
+.track-group.edge-to-edge .track-row {
+  padding: 10px 24px;
 }
 
 .track-row--recovery {
@@ -56,22 +90,25 @@
 .track-row-meta {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
+  gap: 16px;
 }
 
 .recovery-state {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  min-width: 80px;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
   color: var(--secondary);
   font-size: 11px;
-  font-weight: 570;
+  font-weight: 560;
+  white-space: nowrap;
   text-transform: capitalize;
 }
 
 .recovery-state::before {
+  display: inline-block;
   width: 5px;
   height: 5px;
   border-radius: 50%;
@@ -221,12 +258,19 @@
   justify-content: space-between;
   gap: 12px;
   margin: 0 24px 16px;
-  border: 1px solid var(--separator);
-  border-radius: 9px;
   padding: 9px 12px;
   color: var(--secondary);
+  font-size: 13px;
+  border-radius: 9px;
   background: var(--surface-subtle);
-  font-size: 12px;
+}
+
+.review-toast--inline {
+  margin: 0 24px 16px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--tertiary);
 }
 
 .review-scan-note {
@@ -245,5 +289,30 @@
   font: inherit;
   font-weight: 620;
   cursor: pointer;
+}
+
+.floating-action-bar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .floating-action-bar {
+    background: rgba(250, 250, 250, 0.7);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  }
 }
 

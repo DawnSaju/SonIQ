@@ -123,6 +123,7 @@ export interface SoundtrackRecord {
   sourceAvailability: SourceAvailability;
   entries: SoundtrackEntry[];
   receipt: RecognitionReceipt;
+  coverEntryId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -133,6 +134,7 @@ export interface CreateSoundtrackRecordInput {
   entries: readonly SoundtrackEntry[];
   receipt?: RecognitionReceipt;
   sourceAvailability?: SourceAvailability;
+  coverEntryId?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -508,6 +510,7 @@ export function createSoundtrackRecord(input: CreateSoundtrackRecordInput): Soun
     sourceAvailability: sanitizeSourceAvailability(input.sourceAvailability),
     entries,
     receipt: sanitizeReceipt(input.receipt, fallbackReceipt),
+    coverEntryId: input.coverEntryId,
     createdAt,
     updatedAt,
   };
