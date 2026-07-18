@@ -508,6 +508,7 @@ export function createSoundtrackRecord(input: CreateSoundtrackRecordInput): Soun
     sourceAvailability: sanitizeSourceAvailability(input.sourceAvailability),
     entries,
     receipt: sanitizeReceipt(input.receipt, fallbackReceipt),
+
     createdAt,
     updatedAt,
   };
@@ -547,6 +548,7 @@ export function parseSoundtrackRecord(value: unknown): SoundtrackRecord | null {
     sourceAvailability: sanitizeSourceAvailability(raw.sourceAvailability),
     entries,
     receipt: sanitizeReceipt(raw.receipt, fallbackReceipt),
+
     createdAt,
     updatedAt,
   };

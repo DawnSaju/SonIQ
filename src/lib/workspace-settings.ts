@@ -10,7 +10,7 @@ export const soniqOwnedStorageKeys = [
   "soniq:soundtrack-library-v2",
 ] as const;
 
-/** Deliberately accepts only removeItem, so callers cannot clear unrelated data. */
-export function removeSoniqOwnedStorage(storage: Pick<Storage, "removeItem">) {
+/** Deliberately restricts API so callers cannot clear unrelated data. */
+export function removeSoniqOwnedStorage(storage: Pick<Storage, "removeItem" | "length" | "key">) {
   for (const key of soniqOwnedStorageKeys) storage.removeItem(key);
 }

@@ -37,10 +37,10 @@ import {
   recordForResult,
   removeLocal,
   resetSoniqOwnedStorage,
-  supportedExtensions,
   themeKey,
   writeLocal,
   persistSoundtrackRecords,
+  libraryStore,
 } from "./features/workspace/utils";
 import type {
   ActiveSoundtrackMap,
@@ -78,7 +78,8 @@ export default function App() {
   const [scanNotice, setScanNotice] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
   const [scanProgress, setScanProgress] = useState<ScanProgress | null>(null);
-  const [records, setRecords] = useState<SoundtrackRecord[]>(readSoundtrackRecords);
+  const [records, setRecords] = useState<SoundtrackRecord[]>([]);
+  const [recordsLoaded, setRecordsLoaded] = useState(false);
   const [previewRecord, setPreviewRecord] = useState<SoundtrackRecord | null>(null);
   const [activeRecordId, setActiveRecordId] = useState<string | null>(null);
   const [enhancedRecognition, setEnhancedRecognition] = useState(true);
@@ -122,6 +123,16 @@ export default function App() {
   const theme = themePreference === "system" ? systemTheme : themePreference;
 
   useEffect(() => {
+    let disposed = false;
+    readSoundtrackRecords().then((loaded) => {
+      if (disposed) return;
+      setRecords(loaded);
+      setRecordsLoaded(true);
+    });
+    return () => { disposed = true; };
+  }, []);
+
+  useEffect(() => {
     if (!source?.isFixture || previewRecord || !["review", "moments", "handoff"].includes(screen)) return;
     const record = recordForResult(
       {
@@ -147,12 +158,13 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!recordsLoaded) return;
     if (skipNextHistoryPersistRef.current) {
       skipNextHistoryPersistRef.current = false;
       return;
     }
-    persistSoundtrackRecords(records);
-  }, [records]);
+    void persistSoundtrackRecords(records);
+  }, [records, recordsLoaded]);
 
   useEffect(() => {
     if (!isTauri()) return;
@@ -371,6 +383,11 @@ export default function App() {
       setScreen("review");
       return;
     }
+    if (source?.bookmark) {
+      libraryStore.set("soniq:source-bookmark:" + record.id, source.bookmark)
+        .then(() => libraryStore.save())
+        .catch(() => undefined);
+    }
     setActiveSoundtrackMap(result.soundtrackMap ? { recordId: record.id, map: result.soundtrackMap } : null);
     setPendingMomentRange(null);
     updateRecords((current) => [record, ...current.filter((item) => item.id !== record.id)]);
@@ -412,7 +429,9 @@ export default function App() {
       setEnhancedRecognition(true);
       setDragActive(false);
       setWaveform(null);
-      setSource({ fileName: info.fileName, duration: info.durationLabel, durationSeconds: info.durationSeconds, path });
+      let bookmark: string | undefined = undefined;
+      if (isTauri()) bookmark = await invoke<string>("create_bookmark", { path }).catch(() => undefined);
+      setSource({ fileName: info.fileName, duration: info.durationLabel, durationSeconds: info.durationSeconds, path, bookmark });
       setActiveView("scan");
       setScreen("pending");
       if (showOnboarding) persistOnboarding();
@@ -435,7 +454,12 @@ export default function App() {
       if (typeof selected !== "string") return;
       const info = await invoke<VideoInfo>("inspect_video", { sourcePath: selected });
       const checkedAt = new Date().toISOString();
-      setSource({ fileName: info.fileName, duration: info.durationLabel, durationSeconds: info.durationSeconds, path: selected });
+      const bookmark = await invoke<string>("create_bookmark", { path: selected }).catch(() => undefined);
+      setSource({ fileName: info.fileName, duration: info.durationLabel, durationSeconds: info.durationSeconds, path: selected, bookmark });
+      if (bookmark) {
+        await libraryStore.set("soniq:source-bookmark:" + activeRecordId, bookmark);
+        await libraryStore.save();
+      }
       updateActiveRecord((record) => createSoundtrackRecord({
         ...record,
         source: info,
@@ -583,17 +607,79 @@ export default function App() {
     setActiveView("scan");
   }
 
-  function openRecord(record: SoundtrackRecord) {
+  async function openRecord(record: SoundtrackRecord) {
     setActiveSoundtrackMap(null);
     setPendingMomentRange(null);
     setPreviewRecord(null);
-    if (!(activeRecordId === record.id && source?.path)) {
+
+    let resolvedPath: string | undefined = undefined;
+    let resolvedBookmark: string | undefined = undefined;
+    if (activeRecordId === record.id && source?.path) {
+      resolvedPath = source.path;
+      resolvedBookmark = source.bookmark;
+    } else if (isTauri()) {
+      const savedBookmark = (await libraryStore.get<string>("soniq:source-bookmark:" + record.id)) ?? undefined;
+      let pathToInspect = readLocal("soniq:source-path:" + record.id) ?? undefined;
+
+      if (savedBookmark) {
+        try {
+          pathToInspect = await invoke<string>("resolve_bookmark", { bookmarkBase64: savedBookmark });
+        } catch {
+          // Bookmark is not available anymore
+        }
+      }
+
+      if (pathToInspect) {
+        try {
+          const info = await invoke<VideoInfo>("inspect_video", { sourcePath: pathToInspect });
+          resolvedPath = pathToInspect;
+          resolvedBookmark = savedBookmark;
+
+          if (!savedBookmark) {
+            const newBookmark = await invoke<string>("create_bookmark", { path: pathToInspect }).catch(() => undefined);
+            if (newBookmark) {
+              await libraryStore.set("soniq:source-bookmark:" + record.id, newBookmark);
+              await libraryStore.save();
+              resolvedBookmark = newBookmark;
+            }
+          }
+
+          if (record.sourceAvailability.state !== "available-in-session") {
+            updateRecords((current) => current.map(item => item.id === record.id ? createSoundtrackRecord({
+              ...item,
+              sourceAvailability: { state: "available-in-session", checkedAt: new Date().toISOString() },
+              updatedAt: new Date().toISOString()
+            }) : item));
+          }
+        } catch {
+          // File missing or unreadable
+        }
+      }
+    }
+
+    if (resolvedPath) {
+      setSource({
+        fileName: record.source.fileName,
+        duration: record.source.durationLabel ?? "Saved source",
+        durationSeconds: record.source.durationSeconds,
+        path: resolvedPath,
+        bookmark: resolvedBookmark
+      });
+    } else {
       setSource({
         fileName: record.source.fileName,
         duration: record.source.durationLabel ?? "Saved source",
         durationSeconds: record.source.durationSeconds,
       });
+      if (record.sourceAvailability.state !== "reconnect-needed") {
+        updateRecords((current) => current.map(item => item.id === record.id ? createSoundtrackRecord({
+          ...item,
+          sourceAvailability: { state: "reconnect-needed", checkedAt: new Date().toISOString() },
+          updatedAt: new Date().toISOString()
+        }) : item));
+      }
     }
+
     setActiveRecordId(record.id);
     setReviewMessage(record.entries.length ? "Saved on this Mac. You can continue correcting or exporting this soundtrack." : "No track was saved yet. Add one manually or reconnect the source to try a moment.");
     setScanNotice("");
@@ -699,6 +785,10 @@ export default function App() {
 
   function deleteRecord(record: SoundtrackRecord) {
     updateRecords((current) => current.filter((item) => item.id !== record.id));
+    removeLocal("soniq:source-path:" + record.id);
+    libraryStore.delete("soniq:source-bookmark:" + record.id)
+      .then(() => libraryStore.save())
+      .catch(() => undefined);
     setDeletedRecord(record);
     if (activeRecordId === record.id) {
       setActiveRecordId(null);
@@ -771,7 +861,7 @@ export default function App() {
     // Explicit reset is the only path that intentionally cancels active work.
     invalidateActiveWork();
     skipNextHistoryPersistRef.current = true;
-    resetSoniqOwnedStorage();
+    void resetSoniqOwnedStorage();
     removedEntrySnapshotsRef.current.clear();
     setRecords([]);
     setPreviewRecord(null);

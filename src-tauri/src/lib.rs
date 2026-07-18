@@ -30,7 +30,9 @@ pub fn run() {
             commands::lookup_track_preview,
             commands::save_cue_sheet,
             commands::cancel_active_scan,
-            commands::cancel_active_waveform
+            commands::cancel_active_waveform,
+            commands::create_bookmark,
+            commands::resolve_bookmark
         ])
         .run(tauri::generate_context!())
         .expect("error while running SonIQ");
