@@ -63,10 +63,30 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+[data-tauri-drag-region] {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+button,
+input,
+a,
+textarea,
+[role="button"],
+[role="radiogroup"],
+[role="radio"],
+.sidebar-nav-link {
+  -webkit-app-region: no-drag;
+}
+
 button:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+[tabindex="-1"]:focus {
+  outline: none;
 }
 
 .app-shell,
@@ -76,8 +96,7 @@ input:focus-visible {
   background: var(--window);
 }
 
-.app-shell[data-theme="dark"],
-.onboarding-shell[data-theme="dark"] {
+html[data-theme="dark"] {
   color-scheme: dark;
   --window: #0F0F0F;
   --surface: #161616;
