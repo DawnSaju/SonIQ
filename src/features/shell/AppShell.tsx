@@ -13,9 +13,9 @@ export function AppSidebar({
   onSettings?: () => void;
 }) {
   return (
-    <aside className="app-sidebar" aria-label="SonIQ navigation">
-      <div className="sidebar-brand">
-        <span className="app-brand-mark" aria-hidden="true">
+    <aside className="app-sidebar" aria-label="SonIQ navigation" data-tauri-drag-region>
+      <div className="sidebar-brand" data-tauri-drag-region>
+        <span className="app-brand-mark" aria-hidden="true" data-tauri-drag-region>
           <Music2 size={14} strokeWidth={2.4} />
         </span>
         <span>SonIQ</span>
@@ -56,8 +56,8 @@ export function WorkspaceToolbar({
   onToggleViewMode?: (mode: "list" | "grid") => void;
 }) {
   return (
-    <div className="workspace-toolbar">
-      <div className="toolbar-breadcrumb">
+    <div className="workspace-toolbar" data-tauri-drag-region>
+      <div className="toolbar-breadcrumb" data-tauri-drag-region>
         {context ?? (activeView === "scan" ? "New scan" : activeView === "library" ? "Library" : "Settings")}
       </div>
       <div className="toolbar-actions">
