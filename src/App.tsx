@@ -234,6 +234,10 @@ export default function App() {
   const theme = themePreference === "system" ? systemTheme : themePreference;
 
   useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
     let disposed = false;
     readSoundtrackRecords().then((loaded) => {
       if (disposed) return;

@@ -53,7 +53,7 @@ export function SoundtrackLibraryCanvas({
   }
 
   useEffect(() => {
-    if (deletedRecord) undoDeleteRef.current?.focus();
+    if (deletedRecord) undoDeleteRef.current?.focus({ preventScroll: true });
   }, [deletedRecord]);
 
   return (
@@ -157,7 +157,7 @@ export function SoundtrackLibraryCanvas({
                     ) : (
                       <div className="library-scan-copy"><strong>{record.source.fileName}</strong><small>{formatSavedScanDate(record.updatedAt) + " · " + (record.source.durationLabel ?? "Source unavailable")}</small></div>
                     )}
-                    <span className={cueSheet.length ? "library-scan-status is-confirmed" : "library-scan-status status-muted"}>{summary}</span><div className="library-row-actions"><button className="quiet-action" type="button" onClick={(e) => startEdit(record, e)} aria-label={"Rename " + record.source.fileName}><Pencil size={14} aria-hidden="true" />Rename</button><button className="quiet-action" type="button" onClick={() => onOpen(record)}><History size={14} aria-hidden="true" />Open</button><button className="quiet-action" type="button" onClick={() => onDelete(record)} aria-label={"Delete " + record.source.fileName}><Trash2 size={14} aria-hidden="true" /></button></div>
+                    <span className={cueSheet.length ? "library-scan-status is-confirmed" : "library-scan-status status-muted"}>{summary}</span><div className="library-row-actions"><button className="quiet-action" type="button" onClick={(e) => startEdit(record, e)} aria-label={"Rename " + record.source.fileName}><Pencil size={14} aria-hidden="true" />Rename</button><button className="quiet-action" type="button" onClick={(e) => { e.stopPropagation(); onOpen(record); }}><History size={14} aria-hidden="true" />Open</button><button className="quiet-action" type="button" onClick={(e) => { e.stopPropagation(); onDelete(record); }} aria-label={"Delete " + record.source.fileName}><Trash2 size={14} aria-hidden="true" /></button></div>
                   </div>
                 </motion.li>
               );
