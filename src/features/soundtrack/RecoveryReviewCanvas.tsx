@@ -350,7 +350,7 @@ export function RecoveryReviewCanvas({
 
   useEffect(() => {
     if (removedId && removedEntries.some((entry) => entry.id === removedId)) {
-      undoButtonRef.current?.focus();
+      undoButtonRef.current?.focus({ preventScroll: true });
     }
   }, [removedId, removedEntries]);
 
