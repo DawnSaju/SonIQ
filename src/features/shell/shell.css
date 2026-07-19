@@ -5,7 +5,8 @@
 .app-shell {
   display: flex;
   flex-direction: row;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   color: var(--foreground);
   background: var(--window);
 }
@@ -15,7 +16,7 @@
   flex-direction: column;
   width: 213px;
   flex-shrink: 0;
-  padding: 22px;
+  padding: 38px 22px 22px 22px;
 }
 
 .sidebar-brand {
@@ -90,7 +91,7 @@
 .app-workspace-container {
   display: flex;
   flex: 1;
-  padding: 22px 22px 22px 0;
+  padding: 38px 22px 22px 0;
   min-width: 0;
   /* allows children to shrink */
 }
