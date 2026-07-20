@@ -288,8 +288,10 @@ export function MomentFinderCanvas({
         {notice && <p className="input-feedback" role="alert"><span aria-hidden="true">!</span>{notice}</p>}
         <div className="canvas-actions">
           <span className="quiet-note">{sourceUrl && !previewUnavailable ? "Preview, scrubber, and waveform data remain local to this session." : "The timestamp list remains available without local preview playback."}</span>
-          <Button type="button" variant="secondary" onClick={onBack}>Back to soundtrack</Button>
-          <Button type="button" onClick={() => setConfirming(true)} disabled={!source.path || !rangeIsValid || waveformLoading}>{primaryRecoveryLabel}<ChevronRight size={16} aria-hidden="true" /></Button>
+          <Button type="button" variant="secondary" onClick={onBack}>Back to playlist</Button>
+          {!confirming && (
+            <Button type="button" onClick={() => setConfirming(true)} disabled={!source.path || !rangeIsValid || waveformLoading}>{primaryRecoveryLabel}<ChevronRight size={16} aria-hidden="true" /></Button>
+          )}
         </div>
       </div>
     </section>
