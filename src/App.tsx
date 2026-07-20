@@ -64,7 +64,7 @@ import { Onboarding } from "./features/onboarding/Onboarding";
 import { IntakeCanvas, PendingCanvas, ScanningCanvas } from "./features/scan/ScanCanvases";
 import { RecoveryReviewCanvas } from "./features/soundtrack/RecoveryReviewCanvas";
 import { MomentFinderCanvas } from "./features/moments/MomentFinderCanvas";
-import { CueSheetCanvas } from "./features/export/CueSheetCanvas";
+import { PlaylistExport } from "./features/export/PlaylistExport";
 import { SoundtrackLibraryCanvas } from "./features/library/SoundtrackLibraryCanvas";
 import { SettingsCanvas } from "./features/settings/SettingsCanvas";
 
@@ -585,7 +585,7 @@ export default function App() {
       setScreen("review");
       setActiveView("scan");
     } catch {
-      setScanNotice("SonIQ could not reconnect that source. You can still view and export the saved cue sheet.");
+      setScanNotice("SonIQ could not reconnect that source. You can still view and export the saved playlist.");
     }
   }
 
@@ -1017,7 +1017,7 @@ export default function App() {
     if (!activeRecord) return;
     const cueSheet = createCueSheet(activeRecord.entries);
     try {
-      await navigator.clipboard.writeText(formatCueSheetText(cueSheet, activeRecord.source.fileName + " · SonIQ cue sheet"));
+      await navigator.clipboard.writeText(formatCueSheetText(cueSheet, activeRecord.source.fileName + " · SonIQ playlist"));
       setCopyState("copied");
       window.setTimeout(() => setCopyState(""), 1800);
     } catch {
@@ -1076,7 +1076,7 @@ export default function App() {
     durationSeconds: activeRecord.source.durationSeconds,
   } : null);
   const sourceAvailable = Boolean(source?.path && activeRecord?.sourceAvailability.state === "available-in-session");
-  const toolbarContext = activeView === "settings" ? "Settings" : activeView === "library" ? "Library" : screen === "moments" ? "Moment Finder" : screen === "handoff" ? "Cue sheet" : screen === "review" ? "Soundtrack review" : "New scan";
+  const toolbarContext = activeView === "settings" ? "Settings" : activeView === "library" ? "Library" : screen === "moments" ? "Moment Finder" : screen === "handoff" ? "Playlist" : screen === "review" ? "Playlist review" : "New scan";
 
   return (
     <>
@@ -1095,7 +1095,7 @@ export default function App() {
                 {activeView === "scan" && screen === "scanning" && source && <ScanningCanvas source={source} progress={scanProgress} enhancedRecognition={enhancedRecognition} onCancel={cancelScan} onNext={completeFixtureScan} />}
                 {activeView === "scan" && screen === "review" && activeRecord && visibleSource && <RecoveryReviewCanvas source={visibleSource} record={activeRecord} map={activeRuntimeMap} message={reviewMessage || "No reliable matches were returned for this scan."} sourceAvailable={sourceAvailable} onToggleKept={toggleEntryKept} onEdit={editEntry} onRemove={removeEntry} onUndoRemove={undoRemoveEntry} onAddManual={addManualEntry} onOpenMomentFinder={openMomentFinder} onReconnect={reconnectSource} onContinue={() => setScreen("handoff")} onNewScan={startNewScan} isSpotifyConnected={isSpotifyConnected} spotifyAuthLoading={spotifyAuthLoading} spotifyExportState={spotifyExportState} spotifyExportError={spotifyExportError} onSpotifyConnect={handleSpotifyConnect} onSpotifyExport={() => handleSpotifyExport(activeRecord)} exportPlatform={exportPlatform} youtubeExportState={youtubeExportState} youtubeExportError={youtubeExportError} onYouTubeExport={() => handleYouTubeExport(activeRecord)} />}
                 {activeView === "scan" && screen === "moments" && activeRecord && visibleSource && <MomentFinderCanvas source={visibleSource} record={activeRecord} waveform={waveform} waveformLoading={waveformLoading} enhancedRecognition={enhancedRecognition} initialRange={pendingMomentRange} onEnhancedRecognitionChange={setEnhancedRecognition} onStartTargetedRecovery={runTargetedRecovery} onCancelRecovery={() => { void cancelScan(); }} notice={scanNotice} onBack={leaveMomentFinder} />}
-                {activeView === "scan" && screen === "handoff" && activeRecord && <CueSheetCanvas record={activeRecord} copyState={copyState} exportState={exportState} onCopy={copyCueSheet} onExport={exportCueSheet} onOpenSpotify={openSpotifySearch} onBack={() => setScreen("review")} onRestart={startNewScan} />}
+                {activeView === "scan" && screen === "handoff" && activeRecord && <PlaylistExport record={activeRecord} copyState={copyState} exportState={exportState} onCopy={copyCueSheet} onExport={exportCueSheet} onOpenSpotify={openSpotifySearch} onBack={() => setScreen("review")} onRestart={startNewScan} isSpotifyConnected={isSpotifyConnected} spotifyAuthLoading={spotifyAuthLoading} spotifyExportState={spotifyExportState} spotifyExportError={spotifyExportError} onSpotifyConnect={handleSpotifyConnect} onSpotifyExport={() => handleSpotifyExport(activeRecord)} exportPlatform={exportPlatform} youtubeExportState={youtubeExportState} youtubeExportError={youtubeExportError} onYouTubeExport={() => handleYouTubeExport(activeRecord)} />}
               </div>
             </div>
           </main>

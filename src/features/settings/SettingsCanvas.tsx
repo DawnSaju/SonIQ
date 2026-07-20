@@ -56,9 +56,9 @@ export function SettingsCanvas({
   return (
     <section className="settings-view" aria-labelledby="screen-title">
       <h1 id="screen-title" className="sr-only" tabIndex={-1}>Settings</h1>
-      
+
       <div className="settings-content">
-        
+
         {/* Workspace Section */}
         <div className="settings-section">
           <h2 className="settings-section-title">Workspace</h2>
@@ -134,17 +134,17 @@ export function SettingsCanvas({
         {/* Integrations Section */}
         <div className="settings-section">
           <h2 className="settings-section-title">Integrations</h2>
-          
+
           <div className="settings-form-row">
             <div className="settings-form-label">
               <label>Default Export Platform</label>
-              <p className="settings-form-desc">Choose where to export your soundtracks by default.</p>
+              <p className="settings-form-desc">Choose where to export your playlists by default.</p>
             </div>
             <div className="settings-form-control">
               <div className="segmented-control" role="radiogroup" aria-label="Default Export Platform">
                 {[{ value: "youtube", label: "YouTube (Free)", icon: Youtube }, { value: "spotify", label: "Spotify", icon: Music2 }].map((opt) => {
                   const isActive = (exportPlatform || "youtube") === opt.value;
-                  
+
                   return (
                     <motion.button
                       key={opt.value}
@@ -174,7 +174,7 @@ export function SettingsCanvas({
 
           <AnimatePresence initial={false}>
             {exportPlatform === "spotify" && (
-              <motion.div 
+              <motion.div
                 className="settings-form-row"
                 initial={{ height: 0, opacity: 0, marginTop: 0 }}
                 animate={{ height: "auto", opacity: 1, marginTop: 24 }}
@@ -184,7 +184,7 @@ export function SettingsCanvas({
               >
                 <div className="settings-form-label">
                   <label>Spotify Connection</label>
-                  <p className="settings-form-desc">Export your completed soundtracks to Spotify.</p>
+                  <p className="settings-form-desc">Export your playlists to Spotify.</p>
                 </div>
                 <div className="settings-form-control">
                   {isSpotifyConnected ? (

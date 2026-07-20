@@ -566,42 +566,14 @@ export function RecoveryReviewCanvas({
         )}
         {removedId && removedEntries.some((entry) => entry.id === removedId) && (
           <div className="review-toast review-toast--inline" role="status">
-            <span>{removedEntries.find((entry) => entry.id === removedId)?.title ?? "Track"} is removed from the cue sheet.</span>
+            <span>{removedEntries.find((entry) => entry.id === removedId)?.title ?? "Track"} is removed from the playlist.</span>
             <button ref={undoButtonRef} type="button" onClick={() => { onUndoRemove(removedId); setRemovedId(null); }}>Undo</button>
           </div>
         )}
-        <div className="canvas-actions">
-          <span className="quiet-note">{cueSheet.length ? "Your cue sheet includes only kept tracks." : "You can finish with an intentionally empty soundtrack."}</span>
-        </div>
+      <div className="canvas-actions">
+        <span className="quiet-note">{cueSheet.length ? "Your playlist includes only kept tracks." : "You can finish with an intentionally empty playlist."}</span>
+        <Button type="button" onClick={onContinue}>{cueSheet.length ? "Save Playlist" : "Finish"}<ChevronRight size={16} aria-hidden="true" /></Button>
       </div>
-      <div className="floating-action-bar">
-        {(!exportPlatform || exportPlatform === "youtube" || isSpotifyConnected) && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-
-            <Button 
-              type="button" 
-              variant="secondary" 
-              className={`spotify-export-btn ${(exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "error" ? "text-red-500" : ""}`}
-              onClick={exportPlatform === "spotify" ? onSpotifyExport : onYouTubeExport}
-              disabled={
-                (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "loading" || 
-                (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "success" || 
-                !cueSheet.length
-              }
-            >
-              {(exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "loading" ? "Exporting..." : 
-               (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "success" ? <><Check size={15} />Exported</> :
-               (exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "error" ? <><AlertTriangle size={15} />Export Failed</> :
-               <><FileVideo size={15} />Export Playlist</>}
-            </Button>
-          {(exportPlatform === "spotify" ? spotifyExportState : youtubeExportState) === "error" && (
-            <span className="text-red-500 text-xs mt-1" style={{ maxWidth: '300px', textAlign: 'center' }}>
-              {exportPlatform === "spotify" ? spotifyExportError : youtubeExportError}
-            </span>
-          )}
-        </div>
-        )}
-        <Button type="button" onClick={onContinue}>{cueSheet.length ? "Open cue sheet" : "Finish soundtrack"}<ChevronRight size={16} aria-hidden="true" /></Button>
       </div>
     </section>
   );

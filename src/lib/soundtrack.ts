@@ -826,8 +826,8 @@ export function formatCueTimestamp(seconds: number | undefined): string {
 }
 
 /** A portable, human-readable cue sheet suitable for the clipboard. */
-export function formatCueSheetText(entries: readonly CueSheetEntry[], title = "SonIQ cue sheet"): string {
-  const heading = text(title, 160) ?? "SonIQ cue sheet";
+export function formatCueSheetText(entries: readonly CueSheetEntry[], title = "SonIQ playlist"): string {
+  const heading = text(title, 160) ?? "SonIQ playlist";
   const lines = entries.map((entry) => {
     const credit = entry.title + " — " + entry.artist;
     return entry.timestampSeconds === undefined ? "—  " + credit : formatCueTimestamp(entry.timestampSeconds) + "  " + credit;
