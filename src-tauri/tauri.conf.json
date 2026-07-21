@@ -10,6 +10,7 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
@@ -34,7 +35,12 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/icon.icns"]
+    "icon": ["icons/icon.icns"],
+    "resources": {
+      "icons/TrayIconTemplate.png": "TrayIconTemplate.png",
+      "icons/TrayIconTemplate@2x.png": "TrayIconTemplate@2x.png",
+      "icons/TrayIconTemplate@3x.png": "TrayIconTemplate@3x.png"
+    }
   },
   "plugins": {
     "deep-link": {
