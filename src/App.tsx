@@ -170,6 +170,11 @@ export default function App() {
       setSpotifyAuthLoading(true);
       const { url } = await getSpotifyAuthUrl();
       await openUrl(url);
+
+      // reset the loading state if not connected within 15 seconds
+      setTimeout(() => {
+        setSpotifyAuthLoading(false);
+      }, 15000);
     } catch (err) {
       console.error(err);
       setSpotifyAuthLoading(false);
@@ -306,9 +311,54 @@ export default function App() {
         else unlisten = stop;
       });
 
+    let unlistenTrayDrop: (() => void) | undefined;
+    let unlistenTrayClick: (() => void) | undefined;
+
+    void listen<string>("tray-file-dropped", (event) => {
+      const path = event.payload;
+      if (path) {
+        void actionRef.current.acceptVideoPath(path);
+        void getCurrentWindow().setFocus();
+      }
+    }).then((stop) => {
+      if (disposed) stop();
+      else unlistenTrayDrop = stop;
+    });
+
+    void listen("tray-clicked", async () => {
+      const win = getCurrentWindow();
+      await win.unminimize();
+      await win.show();
+      await win.setFocus();
+    }).then((stop) => {
+      if (disposed) stop();
+      else unlistenTrayClick = stop;
+    });
+
+    let unlistenTrayMenu: (() => void) | undefined;
+    void listen<string>("tray-menu-clicked", async (event) => {
+      const action = event.payload;
+      const win = getCurrentWindow();
+      win.unminimize().catch(() => { });
+      win.show().catch(() => { });
+      win.setFocus().catch(() => { });
+
+      if (action === "scan_video") {
+        actionRef.current.chooseVideo();
+      } else if (action === "open_library") {
+        actionRef.current.openLibrary();
+      }
+    }).then((stop) => {
+      if (disposed) stop();
+      else unlistenTrayMenu = stop;
+    });
+
     return () => {
       disposed = true;
       unlisten?.();
+      unlistenTrayDrop?.();
+      unlistenTrayClick?.();
+      unlistenTrayMenu?.();
     };
   }, []);
 
