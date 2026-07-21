@@ -10,6 +10,7 @@ mod runtime;
 mod scan;
 mod source;
 mod state;
+mod tray;
 mod util;
 
 use state::ScanController;
@@ -23,6 +24,10 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .setup(|app| {
+            tray::init(app.handle().clone());
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::inspect_video,
             commands::run_local_scan,
