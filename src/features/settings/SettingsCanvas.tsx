@@ -64,11 +64,11 @@ export function SettingsCanvas({
           <h2 className="settings-section-title">Workspace</h2>
           <div className="settings-form-row">
             <div className="settings-form-label">
-              <label htmlFor="settings-local-name">Local name</label>
-              <p className="settings-form-desc">A local name helps SonIQ greet you.</p>
+              <label htmlFor="settings-local-name">Display Name</label>
+              <p className="settings-form-desc">How SonIQ addresses you in the workspace.</p>
             </div>
             <div className="settings-form-control">
-              <input
+              <motion.input
                 id="settings-local-name"
                 className="mac-text-input"
                 value={nameDraft}
