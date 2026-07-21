@@ -2,9 +2,16 @@
 #import <Foundation/Foundation.h>
 
 typedef void (*DropCallback)(const char *);
+typedef void (*ClickCallback)(void);
+typedef void (*MenuCallback)(const char *);
 
 @interface SoniqTrayView : NSView <NSDraggingDestination>
 @property(nonatomic, assign) DropCallback callback;
+@property(nonatomic, assign) ClickCallback clickCallback;
+@property(nonatomic, assign) MenuCallback menuCallback;
+- (void)onMenuScan:(id)sender;
+- (void)onMenuLibrary:(id)sender;
+- (void)onMenuQuit:(id)sender;
 @end
 
 @implementation SoniqTrayView
@@ -40,19 +47,60 @@ typedef void (*DropCallback)(const char *);
   return NO;
 }
 
-- (NSView *)hitTest:(NSPoint)point {
-  NSView *hit = [super hitTest:point];
-  if (hit == self) {
-    return nil;
+- (void)mouseDown:(NSEvent *)event {
+  [NSApp activateIgnoringOtherApps:YES];
+  if (self.clickCallback) {
+    self.clickCallback();
   }
-  return hit;
+  
+  if ([self.superview isKindOfClass:[NSStatusBarButton class]]) {
+    NSStatusBarButton *btn = (NSStatusBarButton *)self.superview;
+    [btn highlight:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [btn highlight:NO];
+    });
+  }
+}
+
+- (void)rightMouseDown:(NSEvent *)event {
+  [NSApp activateIgnoringOtherApps:YES];
+  
+  NSMenu *menu = [[NSMenu alloc] initWithTitle:@"SonIQ"];
+  
+  NSMenuItem *scanItem = [[NSMenuItem alloc] initWithTitle:@"Scan New Video..." action:@selector(onMenuScan:) keyEquivalent:@""];
+  scanItem.target = self;
+  [menu addItem:scanItem];
+  
+  NSMenuItem *libItem = [[NSMenuItem alloc] initWithTitle:@"Open Library" action:@selector(onMenuLibrary:) keyEquivalent:@""];
+  libItem.target = self;
+  [menu addItem:libItem];
+  
+  [menu addItem:[NSMenuItem separatorItem]];
+  
+  NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:@"Quit SonIQ" action:@selector(onMenuQuit:) keyEquivalent:@"q"];
+  quitItem.target = self;
+  [menu addItem:quitItem];
+  
+  [NSMenu popUpContextMenu:menu withEvent:event forView:self];
+}
+
+- (void)onMenuScan:(id)sender {
+  if (self.menuCallback) self.menuCallback("scan_video");
+}
+
+- (void)onMenuLibrary:(id)sender {
+  if (self.menuCallback) self.menuCallback("open_library");
+}
+
+- (void)onMenuQuit:(id)sender {
+  if (self.menuCallback) self.menuCallback("quit");
 }
 
 @end
 
 static NSStatusItem *globalItem = nil;
 
-void setup_mac_tray(DropCallback callback) {
+void setup_mac_tray(DropCallback drop_callback, ClickCallback click_callback, MenuCallback menu_callback) {
   dispatch_async(dispatch_get_main_queue(), ^{
     globalItem = [[NSStatusBar systemStatusBar]
         statusItemWithLength:NSSquareStatusItemLength];
@@ -71,7 +119,9 @@ void setup_mac_tray(DropCallback callback) {
 
       SoniqTrayView *trayView =
           [[SoniqTrayView alloc] initWithFrame:button.bounds];
-      trayView.callback = callback;
+      trayView.callback = drop_callback;
+      trayView.clickCallback = click_callback;
+      trayView.menuCallback = menu_callback;
       [trayView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
       [button addSubview:trayView];
 
