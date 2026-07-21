@@ -4,7 +4,7 @@ const AUTH_URL = "https://accounts.spotify.com/authorize";
 const TOKEN_URL = "https://accounts.spotify.com/api/token";
 const SCOPES = ["playlist-modify-private", "playlist-modify-public", "user-read-private", "user-read-email"];
 
-export const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+export const CLIENT_ID = "3dcdf6ffffb240f896f2a23dda08cad6";
 export const REDIRECT_URI = "soniq://callback";
 
 export interface SpotifyAuthData {
