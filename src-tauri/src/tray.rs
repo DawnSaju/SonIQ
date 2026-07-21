@@ -22,7 +22,7 @@ extern "C" fn on_file_dropped(path: *const c_char) {
 
 pub fn init(app: AppHandle) {
     APP_HANDLE.set(app).ok();
-    
+
     #[cfg(target_os = "macos")]
     unsafe {
         setup_mac_tray(on_file_dropped);
