@@ -87,6 +87,8 @@ jobs:
             "$dmg_directory"/SonIQ_*_${{ matrix.dmg_suffix }}.dmg.sha256
 
       - name: Build release DMG
+        env:
+          VITE_SPOTIFY_CLIENT_ID: ${{ secrets.VITE_SPOTIFY_CLIENT_ID }}
         run: npm run build:release
 
       - name: Write release checksum
