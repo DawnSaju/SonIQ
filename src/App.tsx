@@ -67,8 +67,12 @@ import { MomentFinderCanvas } from "./features/moments/MomentFinderCanvas";
 import { PlaylistExport } from "./features/export/PlaylistExport";
 import { SoundtrackLibraryCanvas } from "./features/library/SoundtrackLibraryCanvas";
 import { SettingsCanvas } from "./features/settings/SettingsCanvas";
+import { motion, AnimatePresence } from "framer-motion";
+import { Preloader } from "./components/Preloader";
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [splashLoading, setSplashLoading] = useState(true);
   const fileInput = useRef<HTMLInputElement>(null);
   const [screen, setScreen] = useState<AppScreen>(getInitialScreen);
   const [activeView, setActiveView] = useState<AppView>("scan");
@@ -100,8 +104,6 @@ export default function App() {
       ? { ...developmentFixture.source, isFixture: true }
       : null;
   });
-  // Map evidence is intentionally confined to the active source session. It is
-  // never copied into records, receipts, exports, or local history.
   const [activeSoundtrackMap, setActiveSoundtrackMap] = useState<ActiveSoundtrackMap | null>(null);
   const [pendingMomentRange, setPendingMomentRange] = useState<TargetedRange | null>(null);
   const [waveform, setWaveform] = useState<WaveformEnvelope | null>(null);
@@ -125,6 +127,21 @@ export default function App() {
     copyCueSheet: async () => { },
     cancelScan: async () => { },
   });
+
+  const minimumSplashTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    // To prevent jarring flashes on instant local loads, ensure the splash screen
+    // is visible for a minimum of 1.2 seconds before triggering the exit animation.
+    if (recordsLoaded) {
+      const elapsed = Date.now() - minimumSplashTimeRef.current;
+      const remaining = Math.max(0, 1200 - elapsed);
+      const timeout = setTimeout(() => {
+        setSplashLoading(false);
+      }, remaining);
+      return () => clearTimeout(timeout);
+    }
+  }, [recordsLoaded]);
 
   useEffect(() => {
     let unlisten: (() => void) | undefined;
@@ -1130,6 +1147,25 @@ export default function App() {
 
   return (
     <>
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div
+            key="splash-screen"
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ backgroundColor: "var(--window)", color: "var(--foreground)" }}
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <Preloader
+              loading={splashLoading}
+              size={64}
+              strokeWidth={2}
+              onDone={() => setShowSplash(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <input ref={fileInput} className="sr-only" type="file" accept="video/mp4,video/quicktime,video/x-m4v,video/*,.mp4,.mov,.m4v" onChange={onFileChange} />
       {showOnboarding ? <Onboarding name={displayName} theme={theme} onNameChange={setDisplayName} onThemeChange={setAppearance} onComplete={completeOnboarding} /> : (
         <div className="app-shell" data-theme={theme}>
